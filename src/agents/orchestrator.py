@@ -99,7 +99,21 @@ class AgentOrchestrator:
                 diff, env_example, project_name
             )
             results["agents_used"].append("PreflightAgent")
-            results["reports"].append(str(preflight_result))
+
+            # Format preflight report
+            pf = preflight_result.get("result", {})
+            pf_report = f"""## 🚀 Preflight Check
+**Рекомендация**: {pf.get('recommendation', 'N/A')}
+**Уверенность**: {pf.get('confidence', 0)}%
+**Safe to Deploy**: {'✅' if pf.get('safe_to_deploy') else '❌'}
+"""
+            for issue in pf.get("issues", []):
+                icon = {"critical": "🔴", "warning": "🟡", "info": "🟢"}.get(issue.get("severity"), "❓")
+                pf_report += f"\n{icon} [{issue.get('severity')}] {issue.get('message')}"
+
+            pf_meta = preflight_result.get("meta", "")
+            pf_report += f"\n\n📊 {pf_meta}"
+            results["reports"].append(pf_report)
 
             # Local checks
             if project_dir:

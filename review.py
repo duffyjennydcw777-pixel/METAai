@@ -54,10 +54,10 @@ async def cmd_review(args):
         if not filepath.exists():
             print(f"❌ Файл не найден: {filepath}")
             sys.exit(1)
-        agent = ReviewAgent()
-        report = await agent.review_file(filepath, context=args.context or "")
-        print(report)
-        return
+        # Read file as pseudo-diff for orchestrator pipeline
+        content = filepath.read_text(encoding="utf-8")
+        diff = f"--- /dev/null\n+++ b/{filepath.name}\n" + \
+               "\n".join(f"+{line}" for line in content.splitlines())
     elif args.last_commit:
         diff = get_git_diff(last_commit=True)
     elif args.staged:
