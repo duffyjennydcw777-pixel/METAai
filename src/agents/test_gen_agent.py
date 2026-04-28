@@ -3,8 +3,11 @@
 Auto-generates pytest unit tests for Python code.
 """
 from pathlib import Path
+import logging
 from .base import BaseAgent
 from .config import config
+
+logger = logging.getLogger(__name__)
 
 
 SYSTEM_PROMPT = """Ты — опытный QA-инженер. Твоя задача — генерировать pytest тесты для Python кода.
@@ -43,7 +46,8 @@ class TestGenAgent(BaseAgent):
     """Generates pytest tests for Python code."""
 
     def __init__(self):
-        super().__init__(config.test_gen, SYSTEM_PROMPT)
+        super().__init__(config.test_gen)
+        self.system_prompt = SYSTEM_PROMPT
 
     async def generate_tests(self, filepath: Path, context: str = "") -> str:
         """Generate tests for a given Python file."""
@@ -65,7 +69,7 @@ class TestGenAgent(BaseAgent):
         response = await self.call(prompt)
         
         # Clean response — remove markdown code blocks if present
-        cleaned = response.strip()
+        cleaned = response.content.strip()
         if cleaned.startswith("```python"):
             cleaned = cleaned[len("```python"):].strip()
         if cleaned.startswith("```"):
@@ -79,7 +83,7 @@ class TestGenAgent(BaseAgent):
         test_file = test_dir / f"test_{module_name}.py"
         test_file.write_text(cleaned, encoding="utf-8")
 
-        self.log(f"Tests saved: {test_file}")
+        logger.info(f"Tests saved: {test_file}")
         return cleaned
 
     async def generate_for_diff(self, diff: str, context: str = "") -> str:
@@ -97,7 +101,7 @@ class TestGenAgent(BaseAgent):
 """
         response = await self.call(prompt)
         
-        cleaned = response.strip()
+        cleaned = response.content.strip()
         if cleaned.startswith("```python"):
             cleaned = cleaned[len("```python"):].strip()
         if cleaned.startswith("```"):
