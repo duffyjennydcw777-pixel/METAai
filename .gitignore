@@ -1,0 +1,50 @@
+# METAai — .gitignore
+
+# Environment
+.env
+.env.production
+.env.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Node (если frontend)
+node_modules/
+.next/
+out/
+
+# Temp
+*.tmp
+*.bak
+scratch/
