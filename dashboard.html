@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>METAai Dashboard</title>
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --surface: #12121a;
+            --surface-2: #1a1a2e;
+            --border: #2a2a3e;
+            --text: #e4e4ed;
+            --text-muted: #8888a0;
+            --accent: #7c3aed;
+            --accent-glow: rgba(124, 58, 237, 0.3);
+            --green: #22c55e;
+            --yellow: #eab308;
+            --red: #ef4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #7c3aed, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .header .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
+            transform: translateY(-2px);
+        }
+
+        .metric-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .metric-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 0.3rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .projects {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .project-card {
+            text-align: center;
+        }
+
+        .project-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-score {
+            font-size: 3rem;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .score-label {
+            font-size: 1rem;
+            opacity: 0.5;
+        }
+
+        .project-meta {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--surface);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--surface-2);
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+
+        td {
+            padding: 0.8rem 1.5rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+
+        tr:hover td {
+            background: var(--surface-2);
+        }
+
+        .footer {
+            text-align: center;
+            color: var(--text-muted);
+            margin-top: 3rem;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .header h1 { font-size: 1.8rem; }
+            .metric-value { font-size: 1.6rem; }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="header">
+        <h1>🤖 METAai Dashboard</h1>
+        <div class="subtitle">AI-Powered Code Intelligence · Обновлено 2026-04-28 04:14</div>
+    </div>
+
+    <div class="metrics">
+        <div class="card">
+            <div class="metric-value">12</div>
+            <div class="metric-label">Reviews</div>
+        </div>
+        <div class="card">
+            <div class="metric-value" style="color: var(--yellow)">67<span style="font-size: 1rem; opacity: 0.5">/100</span></div>
+            <div class="metric-label">Avg Score</div>
+        </div>
+        <div class="card">
+            <div class="metric-value" style="color: var(--green)">$0.084</div>
+            <div class="metric-label">Total Cost</div>
+        </div>
+        <div class="card">
+            <div class="metric-value">63,859</div>
+            <div class="metric-label">Tokens Used</div>
+        </div>
+    </div>
+
+    <div class="section-title">📁 Проекты</div>
+    <div class="projects">
+        
+        <div class="card project-card">
+            <div class="project-name">METAai</div>
+            <div class="project-score" style="color: #eab308">65<span class="score-label">/100</span></div>
+            <div class="project-meta">8 reviews · $0.084</div>
+        </div>
+        <div class="card project-card">
+            <div class="project-name">ONYX</div>
+            <div class="project-score" style="color: #eab308">72<span class="score-label">/100</span></div>
+            <div class="project-meta">1 reviews · $0.000</div>
+        </div>
+        <div class="card project-card">
+            <div class="project-name">Sylectus</div>
+            <div class="project-score" style="color: #eab308">70<span class="score-label">/100</span></div>
+            <div class="project-meta">2 reviews · $0.000</div>
+        </div>
+        <div class="card project-card">
+            <div class="project-name">backend</div>
+            <div class="project-score" style="color: #eab308">67<span class="score-label">/100</span></div>
+            <div class="project-meta">1 reviews · $0.000</div>
+        </div>
+    </div>
+
+    <div class="section-title">📋 История Reviews</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Тип</th>
+                <th>Проект</th>
+                <th>Score</th>
+                <th>Стоимость</th>
+                <th>Токены</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+        <tr>
+            <td>2026-04-28</td>
+            <td>🔄 batch</td>
+            <td>ONYX</td>
+            <td style="color: #eab308; font-weight: 700">72/100</td>
+            <td>$0.0000</td>
+            <td>0→0</td>
+        </tr>
+        <tr>
+            <td>2026-04-28</td>
+            <td>🔄 batch</td>
+            <td>backend</td>
+            <td style="color: #eab308; font-weight: 700">67/100</td>
+            <td>$0.0000</td>
+            <td>0→0</td>
+        </tr>
+        <tr>
+            <td>2026-04-28</td>
+            <td>🔄 batch</td>
+            <td>Sylectus</td>
+            <td style="color: #eab308; font-weight: 700">70/100</td>
+            <td>$0.0000</td>
+            <td>0→0</td>
+        </tr>
+        <tr>
+            <td>2026-04-28</td>
+            <td>🔄 batch</td>
+            <td>Sylectus</td>
+            <td style="color: #eab308; font-weight: 700">71/100</td>
+            <td>$0.0000</td>
+            <td>0→0</td>
+        </tr>
+        <tr>
+            <td>2026-04-28</td>
+            <td>🛡️ security</td>
+            <td>METAai</td>
+            <td style="color: #ef4444; font-weight: 700">45/100</td>
+            <td>$0.0136</td>
+            <td>9,237→873</td>
+        </tr>
+        <tr>
+            <td>2026-04-28</td>
+            <td>🔍 review</td>
+            <td>METAai</td>
+            <td style="color: #eab308; font-weight: 700">75/100</td>
+            <td>$0.0115</td>
+            <td>9,136→479</td>
+        </tr>
+        <tr>
+            <td>2026-04-28</td>
+            <td>🔍 review</td>
+            <td>METAai</td>
+            <td style="color: #eab308; font-weight: 700">75/100</td>
+            <td>$0.0113</td>
+            <td>9,136→439</td>
+        </tr>
+        <tr>
+            <td>2026-04-28</td>
+            <td>🛡️ security</td>
+            <td>METAai</td>
+            <td style="color: #ef4444; font-weight: 700">45/100</td>
+            <td>$0.0121</td>
+            <td>6,353→1,159</td>
+        </tr>
+        <tr>
+            <td>2026-04-28</td>
+            <td>🔍 review</td>
+            <td>METAai</td>
+            <td style="color: #eab308; font-weight: 700">65/100</td>
+            <td>$0.0088</td>
+            <td>6,252→502</td>
+        </tr>
+        <tr>
+            <td>2026-04-28</td>
+            <td>🔍 review</td>
+            <td>METAai</td>
+            <td style="color: #eab308; font-weight: 700">65/100</td>
+            <td>$0.0088</td>
+            <td>6,252→515</td>
+        </tr>
+        <tr>
+            <td>2026-04-28</td>
+            <td>🔍 review</td>
+            <td>METAai</td>
+            <td style="color: #eab308; font-weight: 700">75/100</td>
+            <td>$0.0088</td>
+            <td>6,252→512</td>
+        </tr>
+        <tr>
+            <td>2026-04-28</td>
+            <td>🔍 review</td>
+            <td>METAai</td>
+            <td style="color: #eab308; font-weight: 700">75/100</td>
+            <td>$0.0088</td>
+            <td>6,252→510</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        METAai v1.2 · Powered by OpenRouter · ${total_cost:.3f} spent · 2026-04-28
+    </div>
+</body>
+</html>

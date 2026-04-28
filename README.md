@@ -1,18 +1,6 @@
-# 🧠 METAai — AI Team OS for Solo Developers
+# 🤖 METAai — AI Team OS
 
-> Мульти-агентная система code review и quality assurance.
-> Один разработчик + 10 AI-агентов = команда уровня enterprise.
-
-## 🚀 Статус: v1.1 LIVE
-
-```
-✅ Preflight Agent — статические проверки (secrets, .env, git status)
-✅ Review Agent — AI code review через OpenRouter ($0.01/review)
-⬜ Security Agent — security audit (код готов, нужна интеграция в pipeline)
-⬜ Test Generator — auto-генерация тестов
-⬜ Architect — design review
-⬜ Remaining 5 agents
-```
+> Multi-agent AI pipeline for solo developers. Review, Security Audit, Preflight — автоматически.
 
 ## ⚡ Quick Start
 
@@ -27,67 +15,101 @@ pip install httpx python-dotenv
 cp .env.example .env
 # Добавить OPENROUTER_API_KEY в .env
 
-# 4. Запуск
+# 4. Первый review
 python review.py review --level 2 --file path/to/your/code.py
-python review.py preflight --dir path/to/project
 ```
 
 ## 🔧 Команды
 
+### Code Review (Level 1-3)
 ```bash
-# Code review (Level 1-3)
 python review.py review --level 2 --file src/handler.py
-python review.py review --level 3 --last-commit
-python review.py review --staged
-
-# Preflight (pre-deploy check)
-python review.py preflight --dir /path/to/project
-
-# Pipe diff
-git diff | python review.py review --stdin --level 2
+python review.py review --level 3 --file src/payments.py    # Review + Preflight + Security
+python review.py review --level 2 --last-commit
+python review.py review --level 2 --staged
 ```
 
-## 📊 Code Complexity Levels (CCL)
+### Preflight Check
+```bash
+python review.py preflight --dir .
+```
 
-| Level | Тип | Тесты | Примеры |
-|-------|-----|-------|---------|
-| 🟢 1 | Trivial | 0 | README, CSS, логирование |
-| 🟡 2 | Standard | 3 | Новый endpoint, баг-фикс |
-| 🔴 3 | Complex | 85%+ | Платежи, auth, миграции |
+### Batch Review
+```bash
+python batch_review.py --level 2 --project C:\path\to\project --critical-only
+python batch_review.py --level 2 --project ./myapp --max-files 15
+python batch_review.py --level 3 --files auth.py payments.py
+```
 
-## 💰 Стоимость
+### Cost Tracking
+```bash
+python costs.py
+```
 
-| Модель | Роль | ~$/review |
-|--------|------|-----------|
-| Claude 3.5 Haiku | Review | $0.01 |
-| Claude 3.5 Sonnet | Architect, Security | $0.03 |
-| GPT-4o Mini | Test Generator | $0.005 |
-| Gemini 2.0 Flash | Preflight | $0.002 |
+### Fix Tracker
+```bash
+python fix_tracker.py              # Показать все баги
+python fix_tracker.py --export     # Экспорт в FIXES.md
+```
 
-**Типичный месяц:** 100 review × $0.01 = **$1/мес**
+### Dashboard
+```bash
+python dashboard.py                # Генерирует dashboard.html
+start dashboard.html               # Открыть в браузере (Windows)
+```
 
-## 📦 Продукты
-
-- `products/prompt-kit/` — SoloCTO Prompt Kit (правила, промпты, шаблоны)
-- Будущее: SoloCTO Template, Курс, AgentForge SaaS
-
-## 📁 Структура
+## 🏗️ Architecture
 
 ```
 METAai/
-├── review.py              # CLI entry point
-├── src/agents/
-│   ├── config.py          # Модели, API keys, paths
-│   ├── base.py            # OpenRouter HTTP client
-│   ├── review_agent.py    # Code review agent
-│   ├── preflight_agent.py # Pre-deploy checks
-│   └── orchestrator.py    # Level → agents → verdict
-├── products/prompt-kit/   # Первый продукт
-├── .agent/rules/          # AI правила проекта
-├── docs/                  # Documentation 2.0
-└── DECISIONS.md           # Архитектурные решения
+├── review.py              # CLI — single file review
+├── batch_review.py        # CLI — batch review (multiple files)
+├── costs.py               # Cost tracking
+├── fix_tracker.py         # Bug aggregator
+├── dashboard.py           # HTML dashboard generator
+├── src/
+│   └── agents/
+│       ├── base.py        # Base agent (API, retry, cost tracking)
+│       ├── config.py      # Model configuration
+│       ├── orchestrator.py # Level-based agent pipeline
+│       ├── review_agent.py # Code review
+│       ├── preflight_agent.py # Deploy safety check
+│       └── security_agent.py  # Security audit
+├── products/
+│   └── prompt-kit/        # SoloCTO Prompt Kit ($9-49)
+├── deploy/
+│   └── pre-push           # Git hook for auto-review
+└── reviews/               # Saved reports
 ```
 
-## 📝 Лицензия
+## 📊 Pipeline Levels
 
-Проприетарный. © 2026.
+| Level | Agents | Time | Cost | Use Case |
+|-------|--------|------|------|----------|
+| **1** | None | 0s | $0 | Docs, CSS, configs |
+| **2** | Reviewer | ~12s | ~$0.009 | Standard changes |
+| **3** | Reviewer + Preflight + Security | ~40s | ~$0.035 | Payments, auth, crypto |
+
+## 💰 Pricing
+
+All models on OpenRouter (Claude 3.5 Haiku):
+- **Single review**: ~$0.01
+- **Batch (10 files)**: ~$0.10
+- **Monthly (5 reviews/day)**: ~$1.50-3.00
+
+## 🏆 Results
+
+| Project | Score | Critical Bugs Found |
+|---------|:-----:|:---:|
+| Sylectus | 71/100 | 12 |
+| ONYX | 72/100 | 8 |
+
+## 🛠️ Products
+
+### SoloCTO Prompt Kit
+5 rule files + 25 prompts + 3 templates. Drop into any project.
+See `products/prompt-kit/`
+
+## 📄 License
+
+MIT
