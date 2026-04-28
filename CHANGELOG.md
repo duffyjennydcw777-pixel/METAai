@@ -4,6 +4,43 @@
 
 ---
 
+## [2026-04-28] - AI Agent - v1.2: Full Pipeline + Dashboard
+
+### Новое
+- **🛡️ Security Agent** — третий агент, аудит безопасности кода
+  - Находит SQL injection, secrets, auth bypass, payload tampering
+  - Протестирован: ONYX payments 45/100, Sylectus handlers 45/100
+- **🔄 Batch Review** (`batch_review.py`) — прогон нескольких файлов одной командой
+  - `--critical-only` — автофильтр по payment/auth/crypto/handler файлам
+  - `--max-files` — лимит количества файлов
+  - Автосохранение отчёта + рейтинг файлов по баллам
+- **💰 Cost Tracker** (`costs.py`) — подсчёт затрат по review-логам
+  - Breakdown по дням, средняя стоимость, прогноз на месяц
+- **🐛 Fix Tracker** (`fix_tracker.py`) — агрегатор всех найденных багов
+  - Парсит все review-отчёты, экспорт в `FIXES.md`
+  - 47 багов найдено (28 critical, 5 high)
+- **📊 HTML Dashboard** (`dashboard.py`) — визуальная сводка
+  - Dark theme, метрики, рейтинг проектов, история review'ов
+- **🪝 Git Pre-Push Hook** (`deploy/pre-push`) — auto-review при push
+- **🔁 Retry Logic** — auto-retry при 429 (5s → 10s → 15s)
+
+### Исправлено
+- **Model IDs** — все агенты на `anthropic/claude-3.5-haiku` (стабильно)
+- **Project naming** — review'ы подписываются реальным именем проекта (не CWD)
+- **Preflight format** — Preflight отчёт теперь readable markdown, не raw JSON
+
+### Результаты Batch Review
+| Проект | Score | Файлов | Worst |
+|--------|:-----:|:------:|-------|
+| Sylectus | 71/100 | 7 | bootstrap_deploy_secret.py (30!) |
+| ONYX | 72/100 | 5 | payments.py (65) |
+
+### Бюджет
+- Потрачено за сессию: $0.084
+- Прогноз: $2.51/мес при 8 reviews/день
+
+---
+
 ## [2026-04-28] - AI Agent - v1.1: Live Agents + Prompt Kit
 
 ### Исправлено
