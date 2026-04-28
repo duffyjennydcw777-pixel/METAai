@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>METAai Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
     <style>
         :root {
             --bg: #0a0a0f;
@@ -125,6 +126,28 @@
             gap: 0.5rem;
         }
 
+        .charts {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .chart-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -165,6 +188,7 @@
             body { padding: 1rem; }
             .header h1 { font-size: 1.8rem; }
             .metric-value { font-size: 1.6rem; }
+            .charts { grid-template-columns: 1fr; }
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -172,12 +196,12 @@
 <body>
     <div class="header">
         <h1>🤖 METAai Dashboard</h1>
-        <div class="subtitle">AI-Powered Code Intelligence · Обновлено 2026-04-28 04:14</div>
+        <div class="subtitle">AI-Powered Code Intelligence · Обновлено 2026-04-28 04:24</div>
     </div>
 
     <div class="metrics">
         <div class="card">
-            <div class="metric-value">12</div>
+            <div class="metric-value">13</div>
             <div class="metric-label">Reviews</div>
         </div>
         <div class="card">
@@ -197,6 +221,11 @@
     <div class="section-title">📁 Проекты</div>
     <div class="projects">
         
+        <div class="card project-card">
+            <div class="project-name">AmazonBOT</div>
+            <div class="project-score" style="color: #eab308">70<span class="score-label">/100</span></div>
+            <div class="project-meta">1 reviews · $0.000</div>
+        </div>
         <div class="card project-card">
             <div class="project-name">METAai</div>
             <div class="project-score" style="color: #eab308">65<span class="score-label">/100</span></div>
@@ -219,6 +248,22 @@
         </div>
     </div>
 
+    <div class="section-title">📈 Аналитика</div>
+    <div class="charts">
+        <div class="chart-container">
+            <div class="chart-title">Score Trend</div>
+            <canvas id="scoreTrend"></canvas>
+        </div>
+        <div class="chart-container">
+            <div class="chart-title">По проектам</div>
+            <canvas id="projectChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <div class="chart-title">По типам</div>
+            <canvas id="typeChart"></canvas>
+        </div>
+    </div>
+
     <div class="section-title">📋 История Reviews</div>
     <table>
         <thead>
@@ -233,6 +278,14 @@
         </thead>
         <tbody>
             
+        <tr>
+            <td>2026-04-28</td>
+            <td>🔄 batch</td>
+            <td>AmazonBOT</td>
+            <td style="color: #eab308; font-weight: 700">70/100</td>
+            <td>$0.0000</td>
+            <td>0→0</td>
+        </tr>
         <tr>
             <td>2026-04-28</td>
             <td>🔄 batch</td>
@@ -333,7 +386,74 @@
     </table>
 
     <div class="footer">
-        METAai v1.2 · Powered by OpenRouter · ${total_cost:.3f} spent · 2026-04-28
+        METAai v1.2 · Powered by OpenRouter · $0.084 spent · 2026-04-28
     </div>
+
+    <script>
+        Chart.defaults.color = '#8888a0';
+        Chart.defaults.borderColor = '#2a2a3e';
+
+        // Score Trend
+        new Chart(document.getElementById('scoreTrend'), {
+            type: 'line',
+            data: {
+                labels: ["#1", "#2", "#3", "#4", "#5", "#6", "#7", "#8", "#9", "#10", "#11", "#12", "#13"],
+                datasets: [{
+                    label: 'Score',
+                    data: [75, 75, 65, 65, 45, 75, 75, 45, 71, 70, 67, 72, 70],
+                    borderColor: '#7c3aed',
+                    backgroundColor: 'rgba(124, 58, 237, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#7c3aed',
+                    pointRadius: 4,
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { min: 0, max: 100, grid: { color: '#1a1a2e' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // Project Radar/Bar
+        new Chart(document.getElementById('projectChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ["METAai", "Sylectus", "backend", "ONYX", "AmazonBOT"],
+                datasets: [{
+                    data: [65.0, 70.5, 67.0, 72.0, 70.0],
+                    backgroundColor: ["#7c3aed", "#06b6d4", "#22c55e", "#eab308", "#ef4444"],
+                    borderWidth: 0,
+                }]
+            },
+            options: {
+                plugins: { legend: { position: 'bottom', labels: { padding: 15 } } },
+                cutout: '60%',
+            }
+        });
+
+        // Type Distribution
+        new Chart(document.getElementById('typeChart'), {
+            type: 'bar',
+            data: {
+                labels: ["review", "security", "batch"],
+                datasets: [{
+                    data: [6, 2, 5],
+                    backgroundColor: ['#7c3aed', '#06b6d4', '#22c55e', '#eab308'],
+                    borderRadius: 8,
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: '#1a1a2e' }, ticks: { stepSize: 1 } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    </script>
 </body>
 </html>

@@ -62,8 +62,9 @@ def parse_all_data(reviews_dir: Path) -> dict:
     return {"reviews": reviews, "projects": projects}
 
 
+
 def generate_html(data: dict) -> str:
-    """Generate dashboard HTML."""
+    """Generate dashboard HTML with Chart.js graphs."""
     reviews = data["reviews"]
     projects = data["projects"]
 
@@ -99,12 +100,36 @@ def generate_html(data: dict) -> str:
             <td>{r['input_tokens']:,}→{r['output_tokens']:,}</td>
         </tr>"""
 
+    # Chart data
+    scores_by_review = [r["score"] for r in reviews if r["score"] > 0]
+    labels_by_review = [f"#{i+1}" for i in range(len(scores_by_review))]
+    scores_json = json.dumps(scores_by_review)
+    labels_json = json.dumps(labels_by_review)
+
+    # Project pie data
+    proj_names = json.dumps(list(projects.keys()))
+    proj_scores = json.dumps([
+        round(sum(p["scores"]) / len(p["scores"]), 1) if p["scores"] else 0
+        for p in projects.values()
+    ])
+    proj_colors = json.dumps([
+        "#7c3aed", "#06b6d4", "#22c55e", "#eab308", "#ef4444", "#f97316"
+    ][:len(projects)])
+
+    # Type distribution
+    type_counts = {}
+    for r in reviews:
+        type_counts[r["type"]] = type_counts.get(r["type"], 0) + 1
+    type_labels = json.dumps(list(type_counts.keys()))
+    type_data = json.dumps(list(type_counts.values()))
+
     return f"""<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>METAai Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
     <style>
         :root {{
             --bg: #0a0a0f;
@@ -226,6 +251,28 @@ def generate_html(data: dict) -> str:
             gap: 0.5rem;
         }}
 
+        .charts {{
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }}
+
+        .chart-container {{
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }}
+
+        .chart-title {{
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }}
+
         table {{
             width: 100%;
             border-collapse: collapse;
@@ -266,6 +313,7 @@ def generate_html(data: dict) -> str:
             body {{ padding: 1rem; }}
             .header h1 {{ font-size: 1.8rem; }}
             .metric-value {{ font-size: 1.6rem; }}
+            .charts {{ grid-template-columns: 1fr; }}
         }}
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -300,6 +348,22 @@ def generate_html(data: dict) -> str:
         {project_cards}
     </div>
 
+    <div class="section-title">📈 Аналитика</div>
+    <div class="charts">
+        <div class="chart-container">
+            <div class="chart-title">Score Trend</div>
+            <canvas id="scoreTrend"></canvas>
+        </div>
+        <div class="chart-container">
+            <div class="chart-title">По проектам</div>
+            <canvas id="projectChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <div class="chart-title">По типам</div>
+            <canvas id="typeChart"></canvas>
+        </div>
+    </div>
+
     <div class="section-title">📋 История Reviews</div>
     <table>
         <thead>
@@ -318,8 +382,75 @@ def generate_html(data: dict) -> str:
     </table>
 
     <div class="footer">
-        METAai v1.2 · Powered by OpenRouter · ${{total_cost:.3f}} spent · {datetime.now().strftime('%Y-%m-%d')}
+        METAai v1.2 · Powered by OpenRouter · ${total_cost:.3f} spent · {datetime.now().strftime('%Y-%m-%d')}
     </div>
+
+    <script>
+        Chart.defaults.color = '#8888a0';
+        Chart.defaults.borderColor = '#2a2a3e';
+
+        // Score Trend
+        new Chart(document.getElementById('scoreTrend'), {{
+            type: 'line',
+            data: {{
+                labels: {labels_json},
+                datasets: [{{
+                    label: 'Score',
+                    data: {scores_json},
+                    borderColor: '#7c3aed',
+                    backgroundColor: 'rgba(124, 58, 237, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#7c3aed',
+                    pointRadius: 4,
+                }}]
+            }},
+            options: {{
+                plugins: {{ legend: {{ display: false }} }},
+                scales: {{
+                    y: {{ min: 0, max: 100, grid: {{ color: '#1a1a2e' }} }},
+                    x: {{ grid: {{ display: false }} }}
+                }}
+            }}
+        }});
+
+        // Project Radar/Bar
+        new Chart(document.getElementById('projectChart'), {{
+            type: 'doughnut',
+            data: {{
+                labels: {proj_names},
+                datasets: [{{
+                    data: {proj_scores},
+                    backgroundColor: {proj_colors},
+                    borderWidth: 0,
+                }}]
+            }},
+            options: {{
+                plugins: {{ legend: {{ position: 'bottom', labels: {{ padding: 15 }} }} }},
+                cutout: '60%',
+            }}
+        }});
+
+        // Type Distribution
+        new Chart(document.getElementById('typeChart'), {{
+            type: 'bar',
+            data: {{
+                labels: {type_labels},
+                datasets: [{{
+                    data: {type_data},
+                    backgroundColor: ['#7c3aed', '#06b6d4', '#22c55e', '#eab308'],
+                    borderRadius: 8,
+                }}]
+            }},
+            options: {{
+                plugins: {{ legend: {{ display: false }} }},
+                scales: {{
+                    y: {{ grid: {{ color: '#1a1a2e' }}, ticks: {{ stepSize: 1 }} }},
+                    x: {{ grid: {{ display: false }} }}
+                }}
+            }}
+        }});
+    </script>
 </body>
 </html>"""
 
