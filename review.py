@@ -34,6 +34,7 @@ from agents.config import config
 from agents.review_agent import ReviewAgent, get_git_diff
 from agents.preflight_agent import PreflightAgent
 from agents.orchestrator import AgentOrchestrator
+from agents.test_gen_agent import TestGenAgent
 
 
 logging.basicConfig(
@@ -129,6 +130,30 @@ async def cmd_preflight(args):
     print(f"📊 Уверенность: {result['confidence']}%")
 
 
+async def cmd_test_gen(args):
+    """Generate pytest tests for a file."""
+    if not args.file:
+        print("❌ Укажи --file для генерации тестов")
+        sys.exit(1)
+
+    filepath = Path(args.file)
+    if not filepath.exists():
+        print(f"❌ Файл не найден: {filepath}")
+        sys.exit(1)
+
+    agent = TestGenAgent()
+    print(f"🧪 Генерирую тесты для {filepath.name}...")
+
+    tests = await agent.generate_tests(filepath, context=args.context or "")
+
+    print(f"\n{'='*60}")
+    print(f"🧪 Generated Tests — {filepath.name}")
+    print(f"{'='*60}")
+    print(tests)
+    print(f"{'='*60}")
+    print(f"💾 Тесты сохранены в generated_tests/test_{filepath.stem}.py")
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="🔍 METAai Code Review — AI-powered code review and preflight checks",
@@ -156,6 +181,11 @@ def main():
     preflight_parser = subparsers.add_parser("preflight", help="Pre-deploy checks")
     preflight_parser.add_argument("--dir", type=str, help="Project directory (default: cwd)")
 
+    # Test-gen command
+    test_parser = subparsers.add_parser("test-gen", help="Generate pytest tests")
+    test_parser.add_argument("--file", type=str, required=True, help="File to generate tests for")
+    test_parser.add_argument("--context", type=str, default="", help="Additional context")
+
     args = parser.parse_args()
 
     # Validate config
@@ -182,6 +212,8 @@ def main():
         asyncio.run(cmd_review(args))
     elif args.command == "preflight":
         asyncio.run(cmd_preflight(args))
+    elif args.command == "test-gen":
+        asyncio.run(cmd_test_gen(args))
 
 
 if __name__ == "__main__":
