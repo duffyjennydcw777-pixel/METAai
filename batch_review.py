@@ -206,7 +206,13 @@ def main():
             print(f"❌ Директория не найдена: {project_dir}")
             sys.exit(1)
         files = find_python_files(project_dir, args.critical_only)
-        project_name = project_dir.name
+        # Find real project root
+        for parent in [project_dir] + list(project_dir.parents):
+            if (parent / ".git").exists():
+                project_name = parent.name
+                break
+        else:
+            project_name = project_dir.name
     else:
         print("❌ Укажи --project или --files")
         sys.exit(1)

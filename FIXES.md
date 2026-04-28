@@ -1,7 +1,7 @@
 # 🐛 Fix Tracker — Сгенерировано METAai
 
-**Дата**: 2026-04-28 04:00
-**Всего issues**: 33
+**Дата**: 2026-04-28 04:12
+**Всего issues**: 52
 
 ## METAai
 
@@ -29,6 +29,20 @@
 | 20 | 🟠 HIGH | lines 13-14 | Использовать vault/secret manager | 🟡 MEDIUM |
 | 21 | 🟠 HIGH | `_is_admin()` | Реализовать многофакторную проверку | 🟡 MEDIUM |
 
+## ONYX
+
+| # | Severity | Category | Description | Fix |
+|---|----------|----------|-------------|-----|
+| 1 | 🔴 CRITICAL | Code Review | Незащищенное кэширование rate limiting в памяти процесса — р | — |
+| 2 | 🔴 CRITICAL | Code Review | Отсутствие проверки лимита платежей для предотвращения злоуп | — |
+| 3 | 🔴 CRITICAL | Code Review | Прямое внедрение зависимостей в методе `create_invoice` (имп | — |
+| 4 | 🔴 CRITICAL | Code Review | Потенциальная гонка условий (race condition) при обновлении  | — |
+| 5 | 🔴 CRITICAL | Code Review | Отсутствие обработки ошибок при работе с базой данных может  | — |
+| 6 | 🔴 CRITICAL | Code Review | Потенциальная уязвимость безопасности в `validate_init_data( | — |
+| 7 | 🔴 CRITICAL | Code Review | Потенциальная уязвимость в `get_user_from_init_data()`: нет  | — |
+| 8 | 🔴 CRITICAL | Code Review | Отсутствие обработки race condition при создании пользовател | — |
+| 9 | 🔴 CRITICAL | Code Review | Отсутствие валидации входных параметров в `create_invoice_li | — |
+
 ## Sylectus
 
 | # | Severity | Category | Description | Fix |
@@ -45,4 +59,19 @@
 | 10 | 🔴 CRITICAL | Code Review | Потенциальная гонка условий в `activate_subscription()` при  | — |
 | 11 | 🔴 CRITICAL | Code Review | Отсутствие проверки максимального лимита очков при списании/ | — |
 | 12 | 🔴 CRITICAL | Code Review | Отсутствие проверки существования пользователя перед обновле | — |
+
+## backend
+
+| # | Severity | Category | Description | Fix |
+|---|----------|----------|-------------|-----|
+| 1 | 🔴 CRITICAL | Code Review | Потенциальная уязвимость безопасности в `validate_init_data( | — |
+| 2 | 🔴 CRITICAL | Code Review | Потенциальная уязвимость в `get_user_from_init_data()`: нет  | — |
+| 3 | 🔴 CRITICAL | Code Review | Отсутствие обработки race condition при создании пользовател | — |
+| 4 | 🔴 CRITICAL | Code Review | Небезопасное кэширование rate limiting в памяти процесса (`c | — |
+| 5 | 🔴 CRITICAL | Code Review | Отсутствие проверки максимальной длины payload может привест | — |
+| 6 | 🔴 CRITICAL | Code Review | Прямое внедрение настроек провайдера платежей без валидации | — |
+| 7 | 🔴 CRITICAL | Code Review | Потенциальная гонка условий при обновлении статуса подписки. | — |
+| 8 | 🔴 CRITICAL | Code Review | Отсутствие обработки ошибок при работе с базой данных может  | — |
+| 9 | 🔴 CRITICAL | Code Review | Отсутствие валидации входных параметров в `create_invoice_li | — |
+| 10 | 🔴 CRITICAL | Code Review | Потенциальная утечка секретов: `provider_token` может быть н | — |
 
