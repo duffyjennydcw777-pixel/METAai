@@ -35,6 +35,7 @@ from agents.review_agent import ReviewAgent, get_git_diff
 from agents.preflight_agent import PreflightAgent
 from agents.orchestrator import AgentOrchestrator
 from agents.test_gen_agent import TestGenAgent
+from agents.refactor_agent import RefactorAgent
 
 
 logging.basicConfig(
@@ -154,6 +155,48 @@ async def cmd_test_gen(args):
     print(f"💾 Тесты сохранены в generated_tests/test_{filepath.stem}.py")
 
 
+async def cmd_fix(args):
+    """Generate fixes from a review report."""
+    agent = RefactorAgent()
+
+    if args.review:
+        review_path = Path(args.review)
+        if not review_path.exists():
+            print(f"❌ Отчёт не найден: {review_path}")
+            sys.exit(1)
+        print(f"🔧 Генерирую фиксы из {review_path.name}...")
+        fixes = await agent.fix_from_review(review_path)
+    elif args.file and args.issue:
+        filepath = Path(args.file)
+        if not filepath.exists():
+            print(f"❌ Файл не найден: {filepath}")
+            sys.exit(1)
+        code = filepath.read_text(encoding="utf-8")
+        print(f"🔧 Генерирую фикс для {filepath.name}...")
+        fixes = await agent.fix_issue(args.issue, code, str(filepath))
+    else:
+        # Auto-fix: find latest review
+        reviews_dir = Path("reviews")
+        if reviews_dir.exists():
+            latest = sorted(reviews_dir.glob("*.md"))[-1] if list(reviews_dir.glob("*.md")) else None
+            if latest:
+                print(f"🔧 Автофикс из последнего review: {latest.name}...")
+                fixes = await agent.fix_from_review(latest)
+            else:
+                print("❌ Нет review отчётов")
+                sys.exit(1)
+        else:
+            print("❌ Папка reviews/ не найдена")
+            sys.exit(1)
+
+    print(f"\n{'='*60}")
+    print(f"🔧 Generated Fixes")
+    print(f"{'='*60}")
+    print(fixes)
+    print(f"{'='*60}")
+
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="🔍 METAai Code Review — AI-powered code review and preflight checks",
@@ -186,6 +229,12 @@ def main():
     test_parser.add_argument("--file", type=str, required=True, help="File to generate tests for")
     test_parser.add_argument("--context", type=str, default="", help="Additional context")
 
+    # Fix command
+    fix_parser = subparsers.add_parser("fix", help="Generate fixes for found issues")
+    fix_parser.add_argument("--review", type=str, help="Review report to fix")
+    fix_parser.add_argument("--file", type=str, help="File with the issue")
+    fix_parser.add_argument("--issue", type=str, help="Issue description")
+
     args = parser.parse_args()
 
     # Validate config
@@ -214,6 +263,8 @@ def main():
         asyncio.run(cmd_preflight(args))
     elif args.command == "test-gen":
         asyncio.run(cmd_test_gen(args))
+    elif args.command == "fix":
+        asyncio.run(cmd_fix(args))
 
 
 if __name__ == "__main__":

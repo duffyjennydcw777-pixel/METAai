@@ -4,6 +4,32 @@
 
 ---
 
+## [2026-04-28] - AI Agent - v1.3: Test Generator + Refactor Agent
+
+### Новое
+- **🧪 Test Generator Agent** (`test_gen_agent.py`) — 4-й агент, auto-генерация pytest тестов
+  - CLI: `python review.py test-gen --file path/to/code.py`
+  - Сгенерировано 25 тестов для Sylectus subscription + ONYX payments
+  - AsyncMock, pytest.mark.asyncio, parametrize — enterprise grade
+- **🔧 Refactor Agent** (`refactor_agent.py`) — 5-й агент, генерация конкретных фиксов
+  - CLI: `python review.py fix --review reviews/report.md`
+  - Auto mode: `python review.py fix` (берёт последний отчёт)
+  - Точечный фикс: `python review.py fix --file code.py --issue "описание"`
+- **🔄 GitHub Actions** (`.github/workflows/review.yml`) — auto-review при PR
+  - Авто-определение complexity level (payment/auth = Level 3)
+  - Постинг результата как комментарий к PR
+
+### Исправлено
+- **Watch mode** — чистый выход по Ctrl+C (без traceback)
+- **TestGenAgent** — fix `response.content` вместо `response`, fix `logger.info` вместо `self.log`
+
+### Статистика за сессию
+- 56 багов найдено (51 critical) → 5 проектов
+- 25 тестов сгенерировано → 3 файла
+- $0.12 потрачено → 14 коммитов → GitHub public repo
+
+---
+
 ## [2026-04-28] - AI Agent - v1.2: Full Pipeline + Dashboard
 
 ### Новое

@@ -130,7 +130,10 @@ def main():
         print(f"❌ Директория не найдена: {directory}")
         sys.exit(1)
 
-    asyncio.run(watch_loop(directory, args.pattern, args.level, args.interval))
+    try:
+        asyncio.run(watch_loop(directory, args.pattern, args.level, args.interval))
+    except KeyboardInterrupt:
+        pass  # Clean exit
 
 
 if __name__ == "__main__":
