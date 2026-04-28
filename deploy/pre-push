@@ -1,0 +1,50 @@
+#!/bin/sh
+# 🪝 METAai Pre-Push Hook
+# Автоматический Level 2 review на каждый push
+# 
+# Установка:
+#   cp deploy/pre-push .git/hooks/pre-push
+#   chmod +x .git/hooks/pre-push
+
+echo "🔍 METAai Pre-Push Review..."
+
+# Получить diff между текущей веткой и remote
+DIFF=$(git diff --cached HEAD)
+
+if [ -z "$DIFF" ]; then
+    DIFF=$(git diff HEAD~1 HEAD)
+fi
+
+if [ -z "$DIFF" ]; then
+    echo "✅ Нет изменений для review"
+    exit 0
+fi
+
+# Определить уровень сложности по diff
+LINES_CHANGED=$(echo "$DIFF" | wc -l)
+LEVEL=2
+
+# Level 3 для >500 строк или если затронуты критичные файлы
+if [ "$LINES_CHANGED" -gt 500 ]; then
+    LEVEL=3
+fi
+
+if echo "$DIFF" | grep -qE "(payment|auth|crypto|secret|password|token)"; then
+    LEVEL=3
+    echo "⚠️  Обнаружены security-критичные изменения → Level 3"
+fi
+
+echo "📊 Complexity: Level $LEVEL ($LINES_CHANGED строк)"
+echo ""
+
+# Запуск review
+python review.py review --level $LEVEL --stdin <<< "$DIFF"
+RESULT=$?
+
+if [ $RESULT -ne 0 ]; then
+    echo ""
+    echo "❌ Review завершился с ошибкой. Push продолжается."
+fi
+
+# Всегда пропускаем push (hook информативный, не блокирующий)
+exit 0
