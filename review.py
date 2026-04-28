@@ -76,7 +76,20 @@ async def cmd_review(args):
 
     # Run pipeline
     orchestrator = AgentOrchestrator()
-    project_name = Path.cwd().name
+
+    # Determine project name from file path or CWD
+    if args.file:
+        filepath = Path(args.file)
+        # Walk up to find project root (where .git or pyproject.toml lives)
+        for parent in filepath.parents:
+            if (parent / ".git").exists() or (parent / "pyproject.toml").exists():
+                project_name = parent.name
+                break
+        else:
+            project_name = filepath.parent.name
+    else:
+        project_name = Path.cwd().name
+
     project_dir = Path.cwd() if args.preflight else None
 
     results = await orchestrator.run_pipeline(
