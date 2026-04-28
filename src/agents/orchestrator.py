@@ -11,6 +11,7 @@ from typing import Optional
 from .config import config
 from .review_agent import ReviewAgent, get_git_diff
 from .preflight_agent import PreflightAgent
+from .security_agent import SecurityAgent
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +25,7 @@ class AgentOrchestrator:
     def __init__(self):
         self.review_agent = ReviewAgent()
         self.preflight_agent = PreflightAgent()
-        # Security and Test agents can be added later
+        self.security_agent = SecurityAgent()
         self.total_cost = 0.0
         self.reports: list[str] = []
 
@@ -120,8 +121,16 @@ class AgentOrchestrator:
                 local = await self.preflight_agent.check_project(project_dir)
                 results["local_checks"] = local
 
-            # TODO: Security Agent (Level 3 + auth/crypto)
             # TODO: Test Generator Agent (Level 2-3)
+
+            # Security Agent (Level 3)
+            logger.info("🛡️ Запускаю Security Agent...")
+            security_report = await self.security_agent.audit_diff(diff, context)
+            results["agents_used"].append("SecurityAgent")
+            results["reports"].append(security_report)
+            self.security_agent.save_report(
+                security_report, "security", project_name or "unknown"
+            )
 
         # Final verdict
         duration = int((datetime.now() - start).total_seconds() * 1000)

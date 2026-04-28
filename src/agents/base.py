@@ -89,26 +89,39 @@ class BaseAgent:
         }
 
         start = datetime.now()
+        max_retries = 3
 
-        async with httpx.AsyncClient(timeout=120.0) as client:
-            response = await client.post(
-                f"{config.base_url}/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {config.api_key}",
-                    "Content-Type": "application/json",
-                    "HTTP-Referer": "https://metaai.dev",
-                    "X-Title": f"METAai-{self.model_config.role}",
-                },
-                json=payload,
-            )
-            if response.status_code != 200:
-                error_body = response.text[:500]
-                logger.error(f"API error {response.status_code}: {error_body}")
-                raise RuntimeError(
-                    f"OpenRouter API error {response.status_code} "
-                    f"(model: {self.model_config.model_id}): {error_body}"
+        for attempt in range(max_retries):
+            async with httpx.AsyncClient(timeout=120.0) as client:
+                response = await client.post(
+                    f"{config.base_url}/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {config.api_key}",
+                        "Content-Type": "application/json",
+                        "HTTP-Referer": "https://metaai.dev",
+                        "X-Title": f"METAai-{self.model_config.role}",
+                    },
+                    json=payload,
                 )
-            data = response.json()
+
+                if response.status_code == 429:
+                    wait = (attempt + 1) * 5  # 5s, 10s, 15s
+                    logger.warning(f"Rate limited (429). Retry {attempt+1}/{max_retries} in {wait}s...")
+                    import asyncio
+                    await asyncio.sleep(wait)
+                    continue
+
+                if response.status_code != 200:
+                    error_body = response.text[:500]
+                    logger.error(f"API error {response.status_code}: {error_body}")
+                    raise RuntimeError(
+                        f"OpenRouter API error {response.status_code} "
+                        f"(model: {self.model_config.model_id}): {error_body}"
+                    )
+                data = response.json()
+                break
+        else:
+            raise RuntimeError(f"Max retries ({max_retries}) exceeded for {self.model_config.model_id}")
 
         duration_ms = int((datetime.now() - start).total_seconds() * 1000)
         agent_response = AgentResponse(data, self.name, duration_ms)
