@@ -4,6 +4,30 @@
 
 ---
 
+## [2026-04-29] - AI Agent - v1.5: 10-Agent Complete + Scientific Analytics
+
+### Новые агенты (5→10)
+- **🏗️ Architect Agent** — архитектурный анализ, проектирование интерфейсов
+- **📊 Performance Agent** — N+1 queries, memory leaks, async bottlenecks
+- **📝 Documentation Agent** — auto-docstrings, README генерация, coverage check
+- **💰 Business Logic Agent** — аудит подписок, платежей, прав доступа
+- **🌍 i18n/UX Agent** — проверка текстов, опечаток, UX-копирайтинга
+
+### Научная аналитика (Shannon/Pareto/Bayes/Kolmogorov)
+- **📐 Shannon Entropy Analyzer** — информационная энтропия кода → auto Level routing
+- **🕸️ Impact Graph** — граф зависимостей, blast radius при изменениях
+- **🎯 Pareto Hot Files** — 80/20 правило, отслеживание проблемных файлов
+- **🧠 Bayesian Bug Predictor** — P(bug) на основе истории review
+- **🧬 Kolmogorov NCD** — поиск дубликатов через compression distance
+- **🧾 Review History** — Information Gain dedup, не ревьюить неизменённые файлы
+
+### CLI команды (12 total)
+- `review`, `preflight`, `test-gen`, `fix` (v1.3)
+- `entropy`, `impact`, `pareto`, `dupes` (v1.4)  
+- `architect`, `perf`, `docs`, `business`, `ux` (v1.5)
+
+---
+
 ## [2026-04-28] - AI Agent - v1.3: Test Generator + Refactor Agent
 
 ### Новое

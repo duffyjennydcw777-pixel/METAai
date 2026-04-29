@@ -312,6 +312,106 @@ def cmd_dupes(args):
     print(f"\n{'=' * 60}")
 
 
+async def cmd_architect(args):
+    """Run architectural analysis."""
+    from agents.architect_agent import ArchitectAgent
+
+    filepath = Path(args.file)
+    if not filepath.exists():
+        print(f"❌ Не найдено: {filepath}")
+        sys.exit(1)
+
+    code = filepath.read_text(encoding="utf-8")
+    agent = ArchitectAgent()
+    print(f"🏗️ Архитектурный анализ: {filepath.name}...")
+
+    report = await agent.analyze_project(code, context=args.context)
+    saved = agent.save_report(report, "architect", filepath.stem)
+    print(report)
+    print(f"\n📄 Сохранено: {saved}")
+
+
+async def cmd_perf(args):
+    """Run performance analysis."""
+    from agents.performance_agent import PerformanceAgent
+
+    filepath = Path(args.file)
+    if not filepath.exists():
+        print(f"❌ Не найдено: {filepath}")
+        sys.exit(1)
+
+    code = filepath.read_text(encoding="utf-8")
+    agent = PerformanceAgent()
+    print(f"📊 Performance анализ: {filepath.name}...")
+
+    report = await agent.analyze(code, context=args.context)
+    saved = agent.save_report(report, "performance", filepath.stem)
+    print(report)
+    print(f"\n📄 Сохранено: {saved}")
+
+
+async def cmd_docs(args):
+    """Generate documentation."""
+    from agents.docs_agent import DocumentationAgent
+
+    filepath = Path(args.file)
+    if not filepath.exists():
+        print(f"❌ Не найдено: {filepath}")
+        sys.exit(1)
+
+    code = filepath.read_text(encoding="utf-8")
+    agent = DocumentationAgent()
+
+    if args.readme:
+        print(f"📝 Генерация README для: {filepath.name}...")
+        report = await agent.generate_readme(code)
+    else:
+        print(f"📝 Генерация docstrings: {filepath.name}...")
+        report = await agent.generate_docstrings(code, str(filepath))
+
+    saved = agent.save_report(report, "docs", filepath.stem)
+    print(report)
+    print(f"\n📄 Сохранено: {saved}")
+
+
+async def cmd_business(args):
+    """Run business logic audit."""
+    from agents.business_agent import BusinessLogicAgent
+
+    filepath = Path(args.file)
+    if not filepath.exists():
+        print(f"❌ Не найдено: {filepath}")
+        sys.exit(1)
+
+    code = filepath.read_text(encoding="utf-8")
+    agent = BusinessLogicAgent()
+    print(f"💰 Business Logic аудит: {filepath.name}...")
+
+    report = await agent.audit(code, context=args.context)
+    saved = agent.save_report(report, "business", filepath.stem)
+    print(report)
+    print(f"\n📄 Сохранено: {saved}")
+
+
+async def cmd_ux(args):
+    """Run UX/i18n text review."""
+    from agents.ux_agent import UXAgent
+
+    filepath = Path(args.file)
+    if not filepath.exists():
+        print(f"❌ Не найдено: {filepath}")
+        sys.exit(1)
+
+    code = filepath.read_text(encoding="utf-8")
+    agent = UXAgent()
+    print(f"🌍 UX/i18n ревью: {filepath.name}...")
+
+    report = await agent.review_text(code, language=args.lang)
+    saved = agent.save_report(report, "ux", filepath.stem)
+    print(report)
+    print(f"\n📄 Сохранено: {saved}")
+
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -370,11 +470,37 @@ def main():
     dupes_parser.add_argument("--path", type=str, required=True, help="Directory to scan")
     dupes_parser.add_argument("--threshold", type=float, default=0.45, help="Similarity threshold")
 
+    # Architect command
+    arch_parser = subparsers.add_parser("architect", help="Architectural analysis")
+    arch_parser.add_argument("--file", type=str, required=True, help="File or dir to analyze")
+    arch_parser.add_argument("--context", type=str, default="", help="Additional context")
+
+    # Performance command
+    perf_parser = subparsers.add_parser("perf", help="Performance analysis")
+    perf_parser.add_argument("--file", type=str, required=True, help="File to analyze")
+    perf_parser.add_argument("--context", type=str, default="", help="Additional context")
+
+    # Documentation command
+    docs_parser = subparsers.add_parser("docs", help="Generate documentation")
+    docs_parser.add_argument("--file", type=str, required=True, help="File to document")
+    docs_parser.add_argument("--readme", action="store_true", help="Generate README instead")
+
+    # Business Logic command
+    biz_parser = subparsers.add_parser("business", help="Business logic audit")
+    biz_parser.add_argument("--file", type=str, required=True, help="File to audit")
+    biz_parser.add_argument("--context", type=str, default="", help="Business context")
+
+    # UX/i18n command
+    ux_parser = subparsers.add_parser("ux", help="UX/i18n text review")
+    ux_parser.add_argument("--file", type=str, required=True, help="File to review")
+    ux_parser.add_argument("--lang", type=str, default="ru", help="Primary language")
+
     args = parser.parse_args()
 
     # Validate config
+    no_api_commands = {"preflight", "entropy", "impact", "pareto", "dupes"}
     errors = config.validate()
-    if errors and args.command != "preflight":
+    if errors and args.command not in no_api_commands:
         print("❌ Ошибки конфигурации:")
         for err in errors:
             print(f"   • {err}")
@@ -408,6 +534,16 @@ def main():
         cmd_pareto(args)
     elif args.command == "dupes":
         cmd_dupes(args)
+    elif args.command == "architect":
+        asyncio.run(cmd_architect(args))
+    elif args.command == "perf":
+        asyncio.run(cmd_perf(args))
+    elif args.command == "docs":
+        asyncio.run(cmd_docs(args))
+    elif args.command == "business":
+        asyncio.run(cmd_business(args))
+    elif args.command == "ux":
+        asyncio.run(cmd_ux(args))
 
 
 if __name__ == "__main__":
