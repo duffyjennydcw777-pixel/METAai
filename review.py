@@ -196,6 +196,51 @@ async def cmd_fix(args):
     print(f"{'='*60}")
 
 
+def cmd_entropy(args):
+    """Run Shannon entropy analysis on file or directory."""
+    from entropy import analyze_file, analyze_directory
+    from collections import Counter
+
+    target = Path(args.path)
+
+    print("=" * 60)
+    print("📐 Shannon Entropy Analyzer")
+    print("=" * 60)
+
+    if target.is_file():
+        report = analyze_file(target)
+        print(f"\n{report}")
+        if report.flags:
+            for flag in report.flags:
+                print(f"    {flag}")
+    elif target.is_dir():
+        reports = analyze_directory(target, args.pattern)
+        if not reports:
+            print(f"No {args.pattern} files found in {target}")
+            return
+
+        level_counts = Counter(r.recommended_level for r in reports)
+        avg_complexity = sum(r.complexity_score for r in reports) / len(reports)
+
+        print(f"\n📁 {target.name}: {len(reports)} files, "
+              f"avg complexity: {avg_complexity:.0f}/100")
+        print(f"   🟢 Level 1: {level_counts.get(1, 0)} | "
+              f"🟡 Level 2: {level_counts.get(2, 0)} | "
+              f"🔴 Level 3: {level_counts.get(3, 0)}")
+        print()
+
+        for report in reports:
+            print(f"  {report}")
+            if report.flags:
+                for flag in report.flags:
+                    print(f"      {flag}")
+    else:
+        print(f"❌ Не найдено: {target}")
+        sys.exit(1)
+
+    print(f"\n{'='*60}")
+
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -235,6 +280,11 @@ def main():
     fix_parser.add_argument("--file", type=str, help="File with the issue")
     fix_parser.add_argument("--issue", type=str, help="Issue description")
 
+    # Entropy command (Shannon analyzer)
+    entropy_parser = subparsers.add_parser("entropy", help="Shannon entropy analysis")
+    entropy_parser.add_argument("--path", type=str, required=True, help="File or directory")
+    entropy_parser.add_argument("--pattern", type=str, default="*.py", help="File pattern")
+
     args = parser.parse_args()
 
     # Validate config
@@ -265,6 +315,8 @@ def main():
         asyncio.run(cmd_test_gen(args))
     elif args.command == "fix":
         asyncio.run(cmd_fix(args))
+    elif args.command == "entropy":
+        cmd_entropy(args)
 
 
 if __name__ == "__main__":
