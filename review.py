@@ -241,6 +241,77 @@ def cmd_entropy(args):
     print(f"\n{'='*60}")
 
 
+def cmd_impact(args):
+    """Show dependency graph and blast radius."""
+    from impact import full_graph_report, analyze_impact
+
+    target = Path(args.path)
+    if not target.is_dir():
+        print(f"❌ Не найдено: {target}")
+        sys.exit(1)
+
+    if args.file:
+        report = analyze_impact(target, args.file)
+        print(f"🕸️ Impact of changing {report.changed_file}:")
+        print(f"   Risk: {report.risk_level} | Blast radius: {report.blast_radius}")
+        print(f"   Direct ({len(report.direct_dependents)}): {', '.join(report.direct_dependents)}")
+        print(f"   Indirect ({len(report.indirect_dependents)}): {', '.join(report.indirect_dependents)}")
+    else:
+        print(full_graph_report(target))
+
+
+def cmd_pareto(args):
+    """Show Pareto hot files."""
+    from pareto import get_hot_files, get_pareto_ratio, ingest_from_fixes
+
+    if args.ingest:
+        ingest_from_fixes()
+        return
+
+    print("=" * 50)
+    print("🎯 Pareto Hot Files")
+    print("=" * 50)
+
+    hot = get_hot_files()
+    if not hot:
+        print("  No data. Run: python review.py pareto --ingest")
+    else:
+        for i, f in enumerate(hot, 1):
+            emoji = "🔴" if f.get("is_hot") else "🟡"
+            print(f"  {emoji} #{i} {f.get('full_path', '?')}")
+            print(f"      Score: {f.get('avg_score', 0):.0f}/100 | Issues: {f.get('total_issues', 0)}")
+
+        r = get_pareto_ratio()
+        print(f"\n  📊 Pareto: {r['ratio']}")
+    print("=" * 50)
+
+
+def cmd_dupes(args):
+    """Find code duplication via Kolmogorov NCD."""
+    from kolmogorov import find_duplicates
+
+    target = Path(args.path)
+    if not target.is_dir():
+        print(f"❌ Не найдено: {target}")
+        sys.exit(1)
+
+    print("=" * 60)
+    print("🧬 Kolmogorov Code Duplication Detector")
+    print(f"   Scanning: {target.name}")
+    print("=" * 60)
+
+    dupes = find_duplicates(target, threshold=args.threshold)
+    if not dupes:
+        print(f"\n  ✅ No duplication found (>{args.threshold:.0%})")
+    else:
+        print(f"\n  ⚠️ {len(dupes)} pair(s):\n")
+        for d in dupes:
+            emoji = "🔴" if d.similarity > 0.7 else "🟡" if d.similarity > 0.5 else "🟢"
+            print(f"  {emoji} {d.similarity:.0%} — {d.file_a} ↔ {d.file_b}")
+
+    print(f"\n{'=' * 60}")
+
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -285,6 +356,20 @@ def main():
     entropy_parser.add_argument("--path", type=str, required=True, help="File or directory")
     entropy_parser.add_argument("--pattern", type=str, default="*.py", help="File pattern")
 
+    # Impact command (dependency graph)
+    impact_parser = subparsers.add_parser("impact", help="Dependency graph & blast radius")
+    impact_parser.add_argument("--path", type=str, required=True, help="Project directory")
+    impact_parser.add_argument("--file", type=str, help="Check impact of specific file")
+
+    # Pareto command (hot files)
+    pareto_parser = subparsers.add_parser("pareto", help="Show hottest bug-prone files")
+    pareto_parser.add_argument("--ingest", action="store_true", help="Import from FIXES.md")
+
+    # Dupes command (code duplication)
+    dupes_parser = subparsers.add_parser("dupes", help="Find code duplication")
+    dupes_parser.add_argument("--path", type=str, required=True, help="Directory to scan")
+    dupes_parser.add_argument("--threshold", type=float, default=0.45, help="Similarity threshold")
+
     args = parser.parse_args()
 
     # Validate config
@@ -317,6 +402,12 @@ def main():
         asyncio.run(cmd_fix(args))
     elif args.command == "entropy":
         cmd_entropy(args)
+    elif args.command == "impact":
+        cmd_impact(args)
+    elif args.command == "pareto":
+        cmd_pareto(args)
+    elif args.command == "dupes":
+        cmd_dupes(args)
 
 
 if __name__ == "__main__":
