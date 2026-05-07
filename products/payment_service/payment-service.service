@@ -1,0 +1,17 @@
+[Unit]
+Description=Solo CTO OS Payment Service (CryptoCloud)
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/payment_service
+ExecStart=/root/payment_service/venv/bin/python3 main.py
+Restart=always
+RestartSec=5
+EnvironmentFile=/root/payment_service/.env
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

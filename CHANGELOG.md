@@ -4,6 +4,92 @@
 
 ---
 
+## [2026-05-07] - AI Agent - v1.9: Payment Service Hardening 🔒
+
+### Безопасность
+- **Секреты вынесены из кода** — API_KEY, TG_BOT_TOKEN из `main.py` → `.env`
+- **python-dotenv** — загрузка конфигурации с fallback (local `.env` → project `.env`)
+- **CORS middleware** — разрешены только GitHub Pages и localhost
+
+### Инфраструктура
+- **Порт 8001 → 8002** — 8001 занят Sylectus webapp, payment service переехал на 8002
+- **UFW firewall** — открыт порт 8002/tcp (был закрыт!)
+- **Python venv** — Debian 12 PEP 668, создан `/root/payment_service/venv/`
+- **systemd** — `payment-service.service` (auto-restart, выживает ребут)
+- **start.sh** — обход PowerShell `>` redirect перехвата (PS-006)
+
+### Кнопка Buy Now
+- **Починена!** Причины поломки: (1) порт 8001 занят Sylectus, (2) порт 8002 закрыт файрволлом
+- **CryptoCloud checkout** — инвойс создаётся, страница оплаты открывается ✅
+- **Тестовый режим** — заявка на production отправлена (ожидание до 24ч)
+
+### Anti-Patterns
+- **PS-006** добавлен: PowerShell перехватывает `>` / `>>` в SSH-командах
+
+---
+
+## [2026-05-05] - AI Agent - v1.8: Solo CTO OS — LAUNCHED 🚀
+
+### Монетизация
+- **Продукт**: Solo CTO OS Pro — $149 (launch) / $249 (full)
+- **Лэндинг**: https://duffyjennydcw777-pixel.github.io/solocto-os/ (live)
+- **Оплата**: USDT TRC-20 → `TE18CRGjhC5Woag4gKjH8VUTDaN7iDxr4W`
+- **Поддержка**: Telegram `@IrattaRazma`
+- **ZIP**: `products/dist/solocto-os-pro-v1.0.zip` (97 KB, 60+ файлов)
+
+### Контент пакета (4 слоя)
+- **Layer 1**: AI Rules (5 правил, 25 промптов, 6 шаблонов)
+- **Layer 2**: Multi-Agent Pipeline (10 агентов, 6 аналитических модулей)
+- **Layer 3**: Meta-Engineering (Anti-Patterns Registry, Context Manifest Spec)
+- **Layer 4**: Second Brain Vault (8 папок, Dashboard, VISION, Business, Life OS)
+
+### Инфраструктура
+- **`products/solocto-os/`** — полный generic vault template
+- **`products/build_full_package.py`** — build script v2 (полный пакет)
+- **`products/landing/`** — лэндинг (HTML+CSS, dark premium theme)
+- **`github.com/duffyjennydcw777-pixel/solocto-os`** — публичный репо лэндинга
+
+---
+
+## [2026-05-05] - AI Agent - v1.7: Packaging + Docs + Session State
+
+### Монетизация
+- **`products/build_package.py`** — скрипт сборки ZIP-архивов для Gumroad
+  - 3 тира: Starter ($9), Pro ($19), Team ($49)
+  - Генерирует MANIFEST.txt и TEAM_SETUP.md (для Team тира)
+  - Output: `products/dist/*.zip`
+
+### Документация
+- **`docs/1_PRODUCT.md`** — заполнен реальными данными (продукты, аудитория, метрики, roadmap)
+- **`docs/2_ARCHITECTURE.md`** — заполнен (стек, структура кода, ADR, диаграммы pipeline)
+- **`session_state.md`** — создан в scratch-директории (контекст между сессиями)
+
+### Следующий шаг
+- Запустить `python products/build_package.py` → загрузить dist/*.zip на Gumroad
+
+---
+
+## [2026-05-03] - AI Agent - v1.6: Context Manifest & ADR AI Instructions
+
+### Мета-инженерия
+- **Context Manifest Spec v1.0** (`docs/context_manifest_spec.md`) — универсальный стандарт `.agent/context_manifest.yaml`
+  - Маршрутизация контекста: `always_load` + `load_when` (по типу задачи)
+  - Agent Firewall: `forbidden` секция с жёсткими guardrails
+  - Domain Hints: терминология и инварианты для снижения галлюцинаций
+  - Обязательная валидация: `before_commit` + `before_deploy` чеклисты
+- **Первое внедрение**: Sylectus `.agent/context_manifest.yaml` (8 типов задач, 10 guardrails)
+- **ADR + AI Instructions**: все 6 DEC в Sylectus DECISIONS.md получили секцию `AI Instructions`
+- **DEC-007**: Context Manifest добавлен как архитектурное решение в Sylectus
+- **Knowledge Items**: паттерны #9 (Context Manifest) и #10 (ADR AI Instructions) добавлены в `project-management-patterns`
+- **GEMINI.md**: Sylectus agent routing обновлён — manifest читается первым (шаг 0)
+
+### Анализ стратегического документа
+- Глубокий анализ `AI_native_products_Telegram_Sylectus_full_chat.docx` (840 параграфов)
+- Извлечены: True RPM формула, scoring engine spec, тарифная сетка, GTM-стратегия, продажный скрипт
+- Action Items матрица: 13 задач с приоритетами и effort-оценкой
+
+---
+
 ## [2026-04-29] - AI Agent - v1.5: 10-Agent Complete + Scientific Analytics
 
 ### Новые агенты (5→10)
