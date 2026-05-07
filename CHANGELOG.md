@@ -4,6 +4,32 @@
 
 ---
 
+## [2026-05-08] - AI Agent - v2.0: Unified Payment & Auto-Delivery 💰
+
+### Payment Service v2
+- **Unified service** — delivery_bot объединён с payment_service, один процесс
+- **Auto-delivery** — webhook получает оплату → ZIP автоматически отправляется в TG админу для пересылки
+- **Идемпотентность** — `processed_orders.json` предотвращает повторную обработку webhook'ов
+- **`secrets.token_hex(8)`** — замена `os.urandom(4)` для генерации order_id
+- **Per-invoice webhook URL** — `url_callback` передаётся в каждом API-вызове (dashboard CryptoCloud read-only)
+- **Success/Fail redirect** — `url_success` / `url_return` в payload инвойса
+
+### Инфраструктура
+- **HTTPS через nginx proxy** — `location /pay/` → `:8002` на `ironyx.tech`, mixed content решён
+- **URL миграция** — `http://92.246.137.35:8002/api/v1/` → `https://api.ironyx.tech/pay/`
+- **systemd v2** — обновлён unit файл, auto-restart
+- **ZIP на сервере** — `solocto-os-pro-v1.0.zip` рядом с `main.py` для auto-delivery
+
+### Лендинг
+- **Кнопки Buy** — HTTPS URL вместо HTTP (mixed content fix)
+- **success.html** — обновлён текст (убрано "check email", добавлен реальный flow)
+- **Pushed** — GitHub Pages обновлён
+
+### Ожидание
+- ⏳ CryptoCloud production mode (заявка на рассмотрении)
+
+---
+
 ## [2026-05-07] - AI Agent - v1.9: Payment Service Hardening 🔒
 
 ### Безопасность

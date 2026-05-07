@@ -1,5 +1,5 @@
 [Unit]
-Description=Solo CTO OS Payment Service (CryptoCloud)
+Description=Solo CTO OS Payment Service v2 (CryptoCloud + Auto-Delivery)
 After=network.target
 
 [Service]
@@ -10,8 +10,6 @@ ExecStart=/root/payment_service/venv/bin/python3 main.py
 Restart=always
 RestartSec=5
 EnvironmentFile=/root/payment_service/.env
-StandardOutput=journal
-StandardError=journal
 
 [Install]
 WantedBy=multi-user.target
