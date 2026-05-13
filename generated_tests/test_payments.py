@@ -10,7 +10,6 @@ from app.routers.payments import (
     process_successful_payment,
     CreateInvoiceRequest
 )
-from app.config import settings
 
 @pytest.fixture
 def mock_db():

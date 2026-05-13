@@ -83,7 +83,7 @@ def print_tracker(issues: list[dict]):
     high = [i for i in issues if "HIGH" in i["severity"]]
 
     print(f"\n{'='*60}")
-    print(f"🐛 METAai Fix Tracker")
+    print("🐛 METAai Fix Tracker")
     print(f"{'='*60}")
     print(f"🔴 Critical: {len(critical)}")
     print(f"🟠 High:     {len(high)}")
@@ -91,7 +91,7 @@ def print_tracker(issues: list[dict]):
 
     # By project
     projects = Counter(i["project"] for i in issues)
-    print(f"\n📁 По проектам:")
+    print("\n📁 По проектам:")
     for proj, count in projects.most_common():
         proj_critical = len([i for i in issues if i["project"] == proj and "CRITICAL" in i["severity"]])
         print(f"   {proj}: {count} issues ({proj_critical} critical)")
@@ -125,7 +125,7 @@ def print_tracker(issues: list[dict]):
 
 def export_fixes(issues: list[dict], output: Path):
     """Export issues to FIXES.md."""
-    content = f"# 🐛 Fix Tracker — Сгенерировано METAai\n\n"
+    content = "# 🐛 Fix Tracker — Сгенерировано METAai\n\n"
     content += f"**Дата**: {datetime.now().strftime('%Y-%m-%d %H:%M')}\n"
     content += f"**Всего issues**: {len(issues)}\n\n"
 

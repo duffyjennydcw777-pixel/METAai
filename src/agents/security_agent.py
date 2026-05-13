@@ -2,7 +2,6 @@
 🛡️ Security Agent — Аудит безопасности кода.
 Ищет уязвимости: SQL injection, XSS, secrets, auth bypass.
 """
-from pathlib import Path
 
 from .base import BaseAgent
 from .config import config

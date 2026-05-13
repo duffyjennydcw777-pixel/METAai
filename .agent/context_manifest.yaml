@@ -1,0 +1,80 @@
+# .agent/context_manifest.yaml
+# METAai — Context Manifest v1.0
+# Standard: METAai Context Manifest Spec (self-referential!)
+
+project:
+  name: "METAai"
+  type: "cli-tool"
+  stage: "production"
+  primary_language: "Python"
+
+# ─── Контекст, загружаемый ВСЕГДА ───────────────────────
+always_load:
+  - .agent/rules/PROJECT.md
+  - DECISIONS.md
+  - CHANGELOG.md
+
+# ─── Условная загрузка по типу задачи ───────────────────
+load_when:
+  agents:
+    description: "Работа с AI-агентами (review, test-gen, refactor, security)"
+    files:
+      - src/agents/base.py
+      - src/agents/config.py
+      - src/agents/orchestrator.py
+
+  analytics:
+    description: "Научная аналитика (entropy, impact, pareto, bayes, kolmogorov)"
+    files:
+      - entropy.py
+      - impact.py
+      - pareto.py
+      - bayes.py
+      - kolmogorov.py
+
+  meta_engineering:
+    description: "Context Manifest, ADR specs, управленческие паттерны"
+    files:
+      - docs/context_manifest_spec.md
+      - SOLUTION_PATTERNS.md
+
+  cli:
+    description: "CLI интерфейс и batch operations"
+    files:
+      - review.py
+      - batch_review.py
+      - watch.py
+
+  dashboard:
+    description: "HTML dashboard и визуализация"
+    files:
+      - dashboard.py
+      - dashboard.html
+
+# ─── Запрещённые действия ───────────────────────────────
+forbidden:
+  - "Never hardcode API keys — .env ONLY"
+  - "Never deploy without updating CHANGELOG.md"
+  - "Never modify agent prompts without testing on real code"
+  - "Never change model IDs without verifying on OpenRouter"
+
+# ─── Валидация ──────────────────────────────────────────
+validation:
+  before_commit:
+    - "Verify CHANGELOG.md updated"
+    - "Check no API keys in code"
+  before_deploy:
+    - "Verify .env has OPENROUTER_API_KEY"
+    - "Test at least one review command"
+
+# ─── Доменные знания ────────────────────────────────────
+domain_hints:
+  terminology:
+    entropy: "Shannon information entropy — measures code randomness/complexity"
+    NCD: "Normalized Compression Distance — Kolmogorov-based code similarity"
+    blast_radius: "Set of files affected when a given file changes"
+    information_gain: "Delta in review findings between runs — skip if zero"
+  critical_invariants:
+    - "All agents use OpenRouter API via httpx async"
+    - "Cost tracking is per-request, logged to review history"
+    - "Model routing: Sonnet for architecture, Haiku for reviews, Flash for preflight"

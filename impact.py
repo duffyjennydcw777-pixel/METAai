@@ -150,7 +150,7 @@ def full_graph_report(directory: str | Path, pattern: str = "*.py") -> str:
     # Leaf files (depend on many, nobody depends on them)
     leaves = set(forward.keys()) - set(reverse.keys())
     if leaves:
-        lines.append(f"\n🍃 Leaf files (safe to change, nothing depends on them):")
+        lines.append("\n🍃 Leaf files (safe to change, nothing depends on them):")
         for leaf in sorted(leaves):
             imports = forward.get(leaf, set())
             lines.append(f"  🟢 {leaf}.py (imports {len(imports)} modules)")
@@ -159,7 +159,7 @@ def full_graph_report(directory: str | Path, pattern: str = "*.py") -> str:
     all_connected = set(forward.keys()) | set(reverse.keys())
     isolated = set(file_map.keys()) - all_connected - {"__init__"}
     if isolated:
-        lines.append(f"\n🏝️ Isolated files (no internal deps):")
+        lines.append("\n🏝️ Isolated files (no internal deps):")
         for iso in sorted(isolated):
             lines.append(f"  ⚪ {iso}.py")
 

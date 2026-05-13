@@ -5,7 +5,6 @@
 import subprocess
 from pathlib import Path
 from datetime import datetime
-from typing import Optional
 
 from .base import BaseAgent
 from .config import config

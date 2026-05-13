@@ -1,0 +1,841 @@
+AI-NATIVE ПРОДУКТЫ,
+TELEGRAM-БОТЫ И SYLECTUS
+Упакованный рабочий документ по материалам чата
+Фокус документа: контекстная инженерия для AI, продуктовые идеи без классического программирования, Telegram-боты как канал доставки ценности, Sylectus-бот для мониторинга грузов, монетизация и план разработки.
+Версия: 1.0 | Формат: стратегический и технический мемо
+
+Содержание
+1. Исполнительное резюме
+2. Часть I. Второй мозг для AI и context engineering
+3. Часть II. Топ-10 продуктов без классической среды программирования
+4. Часть III. Топ-10 продуктов на Telegram-ботах
+5. Часть IV. Sylectus Telegram-бот: функции и монетизация
+6. Часть V. План разработки и реализации кода
+7. Приложения: чеклисты, тарифы, источники
+
+1. Исполнительное резюме
+Главная идея: выигрывает не тот, кто просто использует AI, а тот, кто проектирует контекст, процессы, права доступа, память и проверку результата.
+Вся цепочка рассуждений сводится к одной практической линии: AI и Telegram позволяют запускать продукты быстрее, но устойчивое преимущество появляется только тогда, когда продукт упакован вокруг конкретного workflow, имеет понятную экономическую ценность и не зависит от хаотичного ручного промптинга.
+Для AI-разработки ключевой актив — не отдельные prompts, а контекстная операционная система: правила, память, ADR, маршрутизация контекста, sandbox и evals.
+Для no-code / low-code продуктов лучший подход — выбирать повторяемый дорогой workflow и продавать результат, а не технологию.
+Для Telegram-ботов сильнее всего работают продукты, где чат является естественным интерфейсом: заявки, алерты, записи, продажи, support, обучение, личный OS.
+Для Sylectus-бота ценность не в “парсинге”, а в разрешённом мониторинге данных, фильтрации шума, instant alerts, true RPM, deadhead, driver matching, broker notes и отчётах.
+Технический MVP должен начинаться с легального источника данных, mock connector, Telegram alerts, фильтров, scoring и платного пилота.
+Рекомендуемый первый продукт
+Если выбирать одну прикладную идею из всего обсуждения, я бы начал с Sylectus / expedite load alert bot для small fleets и dispatchers.
+
+2. Часть I. Второй мозг для AI и context engineering
+Проблему “второго мозга” для AI нужно решать не как систему заметок, а как операционную память для агентной инженерной системы.
+2.1. Что такое второй мозг для AI
+Обычный второй мозг хранит знания для человека. AI-второй мозг должен делать больше: выбирать релевантный контекст под задачу, держать архитектурные инварианты, знать команды запуска, помнить решения, отсекать устаревшую информацию и контролировать права агента.
+Second Brain for AI =
+  Repo Memory
++ Product Memory
++ Operator Memory
++ Context Router
++ Agent Rules
++ Evals
++ Guardrails
++ Feedback from Production
+
+
+2.2. Главный мета-инженерный принцип
+Memory is code. Context is infrastructure. Prompts are configuration. Agents are untrusted workers.
+Память должна жить рядом с кодом и обновляться как часть Definition of Done.
+Контекст должен маршрутизироваться по задаче, а не передаваться агенту целиком.
+Агенты должны работать в sandbox и не иметь production-доступ по умолчанию.
+Каждый важный архитектурный выбор должен иметь ADR с последствиями и AI-инструкциями.
+Нужно тестировать не только код, но и поведение агентов через evals.
+2.3. Context Manifest
+В каждом проекте полезно иметь manifest, который описывает, какие файлы контекста агент должен загружать всегда, а какие — по типу задачи.
+project:
+  name: "FounderOS"
+  type: "B2B SaaS"
+  stage: "MVP"
+  primary_language: "TypeScript"
+
+agent_context:
+  always_load:
+    - AGENTS.md
+    - docs/architecture/overview.md
+    - docs/domain/core-concepts.md
+    - docs/security/boundaries.md
+
+  load_when:
+    frontend:
+      - docs/ui/design-system.md
+      - docs/product/personas.md
+    backend:
+      - docs/api/contracts.md
+      - docs/database/schema.md
+
+forbidden:
+  - "Never modify production migration files without explicit approval"
+  - "Never delete user data"
+  - "Never introduce new external services without ADR"
+
+validation:
+  required_commands:
+    - "pnpm lint"
+    - "pnpm typecheck"
+    - "pnpm test"
+
+2.4. ADR-first разработка
+ADR — Architecture Decision Record — снижает архитектурную амнезию AI. Агент должен видеть не только текущее решение, но и причины, последствия и запреты.
+# ADR-003: Use Clerk for authentication
+
+## Context
+We need fast authentication for MVP.
+
+## Decision
+Use Clerk for auth.
+
+## Consequences
+- Faster implementation.
+- Vendor dependency.
+- Revisit if enterprise customers require custom SSO.
+
+## AI Instructions
+- Do not implement custom auth.
+- Use Clerk middleware.
+- Keep user identity normalized in our DB.
+
+2.5. Режимы работы агента
+
+2.6. Agent Firewall
+AI coding agent должен считаться недоверенным исполнителем. Базовые ограничения:
+нет production credentials;
+нет доступа к real customer data;
+нет destructive commands без подтверждения;
+нет записи в main branch;
+нет deploy без CI;
+нет удаления backups;
+scoped tokens, branch-per-task, sandboxed shell, devcontainers.
+2.7. Продуктивная AI-среда разработки
+
+2.8. Продукты вокруг context engineering
+
+3. Часть II. Топ-10 продуктов без классической среды программирования
+Формула выбора: повторяемый workflow + явная денежная ценность + доступные данные + возможность продать без сложной интеграции.
+
+Приоритеты по ROI
+
+4. Часть III. Топ-10 продуктов на Telegram-ботах
+Telegram-бот должен быть главным каналом доставки ценности: быстрый ввод, alerts, заявки, квалификация, напоминания, support, обучение.
+
+Мой рейтинг по потенциалу
+
+Минимальный no-code/low-code стек для Telegram-продуктов
+
+5. Часть IV. Sylectus Telegram-бот: функции и монетизация
+Позиционирование: не “серый парсер”, а Telegram-бот для мониторинга разрешённых Sylectus-данных, умной фильтрации и alerts по выгодным грузам.
+5.1. Что мониторить
+
+5.2. Ключевые функции
+Моментальные алерты по подходящим грузам.
+Smart scoring груза: 0–100 с причинами и предупреждениями.
+Deadhead-калькулятор и true RPM.
+Горячие зоны после доставки.
+Авто-квалификация: good / maybe / bad / suspicious / high-margin / backhaul.
+Watchlist по lanes.
+Командный режим для диспетчеров и small fleets.
+CRM по brokers / carriers: notes, rating, blacklist, history.
+Авто-шаблоны переговоров.
+Risk flags для проверки документов и contact identity.
+Пример alert
+Новый груз найден
+
+Chicago, IL → Columbus, OH
+Miles: 355
+Rate: $620
+RPM: $1.75
+Pickup: Today 16:00
+Equipment: Sprinter Van
+Deadhead: 42 mi
+
+Действия:
+[Позвонить] [Сохранить] [Скрыть брокера] [Показать похожие]
+
+Пример scoring
+Score: 84/100
+
+Плюсы:
+- Хороший RPM
+- Низкий deadhead
+- Подходит под текущую позицию водителя
+- Доставка в зону с хорошим outbound спросом
+
+Минусы:
+- Pickup через 2 часа
+- Нет истории по этому контакту
+
+5.3. Монетизация
+
+Дополнительные источники дохода
+Pay-per-alert: $0.05–0.20 за premium alert.
+Комиссия за booked load: fixed $5–20 или 1–3% от маржи.
+White-label для dispatch agencies: $199–499/мес.
+Data insights subscription: weekly lane reports за $49–199/мес.
+Setup fee для B2B: $300–2,000.
+5.4. MVP
+Подключение к разрешённому источнику данных.
+Фильтры по pickup / destination / equipment / RPM / deadhead.
+Telegram alerts.
+Кнопки Save, Hide, Call, Similar, Blacklist.
+Daily summary.
+Лимиты тарифа и платежи.
+5.5. Риски
+
+5.6. Go-to-market
+Первый ICP: dispatchers for sprinter/cargo vans, small expedite fleets, box truck operators, owner-operators, dispatch agencies.
+Оффер: “Получайте лучшие Sylectus-грузы в Telegram быстрее, с true RPM, deadhead и scoring.”
+Сильный B2B-оффер: “Мы настроим Telegram-алерты под ваших водителей, чтобы диспетчер видел только выгодные грузы, а не весь шум load board.”
+Первый платный пакет: $99 setup + $79/month за 3 trucks, 10 filters, alerts, true RPM, deadhead, daily report, broker notes.
+6. Часть V. План разработки и реализации кода
+Главный технический риск — не Telegram и не AI, а корректный доступ к Sylectus-данным. Поэтому порядок: доступ к данным → mock MVP → Telegram alerts → filters/scoring → pilot → payments → dashboard.
+6.1. Целевой MVP
+Получать loads из Sylectus / разрешённого источника.
+Нормализовать данные в единую структуру.
+Применять фильтры пользователя.
+Считать true RPM с deadhead.
+Отправлять Telegram-alert.
+Сохранять действия пользователя: save, hide, blacklist, call, similar.
+6.2. Рекомендуемый стек
+
+6.3. Архитектура
+Sylectus API / Export / Email Feed
+        ↓
+Data Connector
+        ↓
+Normalizer
+        ↓
+PostgreSQL: raw_loads + normalized_loads
+        ↓
+Filter Engine
+        ↓
+Scoring Engine
+        ↓
+Alert Queue
+        ↓
+Telegram Bot
+        ↓
+User Actions / CRM / Reports
+
+6.4. Структура проекта
+sylectus-alert-bot/
+  apps/
+    api/
+      src/main.ts
+      src/routes/
+      src/middleware/
+    bot/
+      src/main.ts
+      src/commands/
+      src/handlers/
+      src/keyboards/
+    worker/
+      src/pollSylectus.ts
+      src/processLoads.ts
+      src/sendAlerts.ts
+
+  packages/
+    core/
+      src/types.ts
+      src/scoring.ts
+      src/filters.ts
+      src/distance.ts
+    connectors/
+      src/sylectus.connector.ts
+      src/email.connector.ts
+      src/csv.connector.ts
+      src/mock.connector.ts
+    db/
+      prisma/schema.prisma
+      src/client.ts
+
+  docker-compose.yml
+  .env.example
+  package.json
+  README.md
+
+6.5. Основные сущности
+export type EquipmentType =
+  | "sprinter"
+  | "cargo_van"
+  | "box_truck"
+  | "straight_truck"
+  | "semi";
+
+export interface Load {
+  externalId: string;
+  source: "sylectus" | "email" | "csv" | "manual";
+  originCity: string;
+  originState: string;
+  originLat?: number;
+  originLng?: number;
+  destinationCity: string;
+  destinationState: string;
+  destinationLat?: number;
+  destinationLng?: number;
+  pickupAt?: Date;
+  deliveryAt?: Date;
+  equipment: EquipmentType;
+  weightLbs?: number;
+  loadedMiles?: number;
+  offeredRate?: number;
+  brokerName?: string;
+  brokerPhone?: string;
+  brokerEmail?: string;
+  rawPayload: unknown;
+  firstSeenAt: Date;
+  lastSeenAt: Date;
+}
+
+export interface Truck {
+  id: string;
+  ownerId: string;
+  driverName: string;
+  equipment: EquipmentType;
+  currentCity: string;
+  currentState: string;
+  currentLat?: number;
+  currentLng?: number;
+  availableAt?: Date;
+  maxDeadheadMiles: number;
+  minRpm: number;
+  excludedStates: string[];
+  preferredStates: string[];
+  isActive: boolean;
+}
+
+export interface LoadFilter {
+  id: string;
+  userId: string;
+  name: string;
+  equipment: EquipmentType[];
+  originStates?: string[];
+  destinationStates?: string[];
+  maxDeadheadMiles: number;
+  minLoadedMiles?: number;
+  maxLoadedMiles?: number;
+  minRpm?: number;
+  minRate?: number;
+  pickupFrom?: Date;
+  pickupTo?: Date;
+  excludedStates?: string[];
+  excludedBrokers?: string[];
+  isActive: boolean;
+}
+
+6.6. Prisma schema — сокращённая версия
+model User {
+  id             String   @id @default(cuid())
+  telegramId     String   @unique
+  username       String?
+  firstName      String?
+  role           UserRole @default(SOLO)
+  subscription   Subscription?
+  trucks         Truck[]
+  filters        LoadFilter[]
+  alerts         Alert[]
+  brokerNotes    BrokerNote[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+enum UserRole {
+  SOLO
+  DISPATCHER
+  ADMIN
+}
+
+model Load {
+  id                String   @id @default(cuid())
+  externalId        String
+  source            String
+  originCity        String
+  originState       String
+  originLat         Float?
+  originLng         Float?
+  destinationCity   String
+  destinationState  String
+  destinationLat    Float?
+  destinationLng    Float?
+  pickupAt          DateTime?
+  deliveryAt        DateTime?
+  equipment         String
+  weightLbs         Int?
+  loadedMiles       Int?
+  offeredRate       Float?
+  brokerName        String?
+  brokerPhone       String?
+  brokerEmail       String?
+  rawPayload        Json
+  firstSeenAt       DateTime @default(now())
+  lastSeenAt        DateTime @default(now())
+  alerts            Alert[]
+
+  @@unique([externalId, source])
+  @@index([originState])
+  @@index([destinationState])
+  @@index([equipment])
+  @@index([pickupAt])
+}
+
+model Alert {
+  id                String      @id @default(cuid())
+  userId            String
+  user              User        @relation(fields: [userId], references: [id])
+  loadId            String
+  load              Load        @relation(fields: [loadId], references: [id])
+  filterId          String
+  filter            LoadFilter  @relation(fields: [filterId], references: [id])
+  truckId           String?
+  score             Int
+  rpm               Float?
+  trueRpm           Float?
+  deadheadMiles     Float?
+  status            AlertStatus @default(QUEUED)
+  telegramMessageId String?
+  sentAt            DateTime?
+  createdAt         DateTime    @default(now())
+
+  @@unique([userId, loadId, filterId])
+}
+
+enum AlertStatus {
+  QUEUED
+  SENT
+  SAVED
+  HIDDEN
+  DISMISSED
+}
+
+6.7. Connector interface
+export interface LoadConnector {
+  name: string;
+  fetchRecentLoads(params: FetchLoadsParams): Promise<Load[]>;
+}
+
+export interface FetchLoadsParams {
+  since?: Date;
+  equipment?: string[];
+  originStates?: string[];
+  destinationStates?: string[];
+}
+
+6.8. Sylectus connector — пример
+Endpoint и поля ниже условные. Реальные пути, авторизация и лимиты нужно брать из API-документации или разрешённого источника данных клиента.
+export class SylectusConnector implements LoadConnector {
+  name = "sylectus";
+
+  constructor(
+    private readonly config: {
+      baseUrl: string;
+      apiKey: string;
+      accountId: string;
+    }
+  ) {}
+
+  async fetchRecentLoads(params: FetchLoadsParams): Promise<Load[]> {
+    const url = new URL("/loads", this.config.baseUrl);
+
+    if (params.since) {
+      url.searchParams.set("since", params.since.toISOString());
+    }
+
+    const res = await fetch(url.toString(), {
+      headers: {
+        "Authorization": `Bearer ${this.config.apiKey}`,
+        "X-Account-Id": this.config.accountId,
+        "Accept": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Sylectus API error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data.items.map(normalizeSylectusLoad);
+  }
+}
+
+6.9. CSV connector для быстрого пилота
+export class CsvConnector implements LoadConnector {
+  name = "csv";
+
+  constructor(private readonly filePath: string) {}
+
+  async fetchRecentLoads(_params: FetchLoadsParams): Promise<Load[]> {
+    const content = await fs.readFile(this.filePath, "utf-8");
+    const rows = parse(content, {
+      columns: true,
+      skip_empty_lines: true,
+    });
+
+    return rows.map((row: any): Load => ({
+      externalId: row.id,
+      source: "csv",
+      originCity: row.origin_city,
+      originState: row.origin_state,
+      destinationCity: row.destination_city,
+      destinationState: row.destination_state,
+      pickupAt: row.pickup_at ? new Date(row.pickup_at) : undefined,
+      deliveryAt: row.delivery_at ? new Date(row.delivery_at) : undefined,
+      equipment: row.equipment,
+      weightLbs: Number(row.weight_lbs || 0),
+      loadedMiles: Number(row.loaded_miles || 0),
+      offeredRate: Number(row.rate || 0),
+      brokerName: row.broker_name,
+      brokerPhone: row.broker_phone,
+      brokerEmail: row.broker_email,
+      rawPayload: row,
+      firstSeenAt: new Date(),
+      lastSeenAt: new Date(),
+    }));
+  }
+}
+
+6.10. Filter engine
+export function matchesFilter(load: Load, filter: LoadFilter): boolean {
+  if (!filter.isActive) return false;
+
+  if (filter.equipment.length > 0 && !filter.equipment.includes(load.equipment)) {
+    return false;
+  }
+
+  if (filter.originStates?.length && !filter.originStates.includes(load.originState)) {
+    return false;
+  }
+
+  if (filter.destinationStates?.length &&
+!filter.destinationStates.includes(load.destinationState)) {
+    return false;
+  }
+
+  if (filter.excludedStates?.includes(load.originState) ||
+      filter.excludedStates?.includes(load.destinationState)) {
+    return false;
+  }
+
+  if (load.brokerName &&
+      filter.excludedBrokers?.some(b => b.toLowerCase() === load.brokerName?.toLowerCase()))
+{
+    return false;
+  }
+
+  if (filter.minRate && (!load.offeredRate || load.offeredRate < filter.minRate)) {
+    return false;
+  }
+
+  if (filter.minLoadedMiles && (!load.loadedMiles || load.loadedMiles <
+filter.minLoadedMiles)) {
+    return false;
+  }
+
+  if (filter.maxLoadedMiles && load.loadedMiles && load.loadedMiles > filter.maxLoadedMiles)
+{
+    return false;
+  }
+
+  return true;
+}
+
+6.11. Scoring engine
+score =
+  rateScore
++ rpmScore
++ deadheadScore
++ pickupUrgencyScore
++ destinationScore
++ brokerScore
+- riskPenalty
+
+export function scoreLoad(load: Load, truck?: Truck): ScoreResult {
+  const reasons: string[] = [];
+  const warnings: string[] = [];
+  let score = 0;
+
+  const rpm = calculateRpm(load.offeredRate, load.loadedMiles);
+
+  if (rpm !== undefined) {
+    if (rpm >= 2) {
+      score += 25;
+      reasons.push(`High RPM: $${rpm.toFixed(2)}`);
+    } else if (rpm >= 1.5) {
+      score += 18;
+      reasons.push(`Good RPM: $${rpm.toFixed(2)}`);
+    } else if (rpm >= 1.2) {
+      score += 8;
+      warnings.push(`Low RPM: $${rpm.toFixed(2)}`);
+    } else {
+      score -= 15;
+      warnings.push(`Very low RPM: $${rpm.toFixed(2)}`);
+    }
+  }
+
+  // Deadhead, true RPM and pickup urgency are added here.
+  score = Math.max(0, Math.min(100, score));
+  return { score, rpm, reasons, warnings };
+}
+
+6.12. Worker: polling and alert queue
+export async function pollAndProcessLoads() {
+  const lastRun = await getLastRunAt();
+  const loads = await connector.fetchRecentLoads({ since: lastRun });
+
+  for (const load of loads) {
+    const dbLoad = await prisma.load.upsert({
+      where: { externalId_source: { externalId: load.externalId, source: load.source } },
+      update: { lastSeenAt: new Date(), rawPayload: load.rawPayload as any, offeredRate:
+load.offeredRate },
+      create: load as any,
+    });
+
+    const filters = await prisma.loadFilter.findMany({
+      where: { isActive: true },
+      include: { user: { include: { trucks: { where: { isActive: true } } } } },
+    });
+
+    for (const filter of filters) {
+      if (!matchesFilter(load as any, filter as any)) continue;
+      const bestTruck = filter.user.trucks[0];
+      const score = scoreLoad(load as any, bestTruck as any);
+      if (score.score < 60) continue;
+
+      const alert = await prisma.alert.upsert({
+        where: { userId_loadId_filterId: { userId: filter.userId, loadId: dbLoad.id,
+filterId: filter.id } },
+        update: {},
+        create: {
+          userId: filter.userId,
+          loadId: dbLoad.id,
+          filterId: filter.id,
+          truckId: bestTruck?.id,
+          score: score.score,
+          rpm: score.rpm,
+          trueRpm: score.trueRpm,
+          deadheadMiles: score.deadheadMiles,
+        },
+      });
+
+      await alertQueue.add("send-alert", { alertId: alert.id });
+    }
+  }
+
+  await setLastRunAt(new Date());
+}
+
+6.13. Telegram bot commands
+/start
+/profile
+/add_truck
+/add_filter
+/my_filters
+/watch_lane
+/blacklist
+/whitelist
+/report
+/billing
+/support
+
+bot.start(async ctx => {
+  const tgUser = ctx.from;
+
+  await prisma.user.upsert({
+    where: { telegramId: String(tgUser.id) },
+    update: { username: tgUser.username, firstName: tgUser.first_name },
+    create: {
+      telegramId: String(tgUser.id),
+      username: tgUser.username,
+      firstName: tgUser.first_name,
+    },
+  });
+
+  await ctx.reply([
+    "Sylectus Load Alert Bot",
+    "",
+    "Я буду присылать подходящие грузы по вашим фильтрам.",
+    "",
+    "Начните с настройки:",
+    "/add_truck — добавить машину",
+    "/add_filter — добавить фильтр",
+    "/my_filters — посмотреть фильтры",
+  ].join("
+"));
+});
+
+6.14. Формат Telegram alert
+Новый подходящий груз
+
+Chicago, IL → Columbus, OH
+Score: 84/100
+Rate: $620
+Loaded miles: 355
+RPM: $1.75
+Deadhead: 42 mi
+True RPM: $1.56
+Pickup: Today 16:00
+Equipment: sprinter
+Broker: ABC Logistics
+
+[Save] [Hide]
+[Blacklist broker]
+[Call]
+
+6.15. Настройка фильтра через Telegram
+/add_filter sprinter origin=IL,IN,WI dest=OH,PA,MI min_rpm=1.5 max_dh=120
+
+export function parseFilterCommand(input: string) {
+  const parts = input.split(/\s+/);
+  const result: Record<string, string> = {};
+
+  for (const part of parts) {
+    const [key, value] = part.split("=");
+    if (key && value) result[key] = value;
+  }
+
+  return {
+    equipment: parts[0] ? [parts[0]] : [],
+    originStates: result.origin?.split(",") ?? [],
+    destinationStates: result.dest?.split(",") ?? [],
+    minRpm: result.min_rpm ? Number(result.min_rpm) : undefined,
+    maxDeadheadMiles: result.max_dh ? Number(result.max_dh) : 150,
+  };
+}
+
+6.16. Payments and limits
+
+6.17. Безопасность
+Не хранить Sylectus password.
+Хранить только API/OAuth token, если это разрешено.
+Шифровать токены.
+Логировать доступ к данным.
+Не отдавать один load пользователям, которым он не положен.
+Не делать impersonation без явного разрешения.
+Не обходить технические ограничения Sylectus.
+6.18. Anti-duplicate and freshness rules
+1. Один externalId + source = один load.
+2. Один userId + loadId + filterId = один alert.
+3. Если груз старше N минут — не отправлять.
+4. Если rate изменился — можно отправить update.
+5. Если score ниже threshold — не отправлять.
+
+6.19. Daily report
+Daily Sylectus Report
+
+Loads matched: 42
+Alerts sent: 17
+Saved: 5
+Hidden: 8
+
+Best RPM:
+Chicago, IL → Columbus, OH
+$2.05 RPM
+
+Most active lanes:
+1. IL → OH
+2. IN → PA
+3. MI → KY
+
+Missed opportunities:
+4 loads expired before action
+
+6.20. Этапы разработки
+
+6.21. Definition of Done для MVP
+Пользователь может добавить truck.
+Пользователь может добавить filter.
+Система получает новые loads.
+Система не дублирует alerts.
+Система считает RPM и true RPM.
+Система отправляет Telegram-alert менее чем за 60 секунд после получения load.
+Пользователь может save/hide/blacklist.
+Есть лимиты тарифа.
+Есть лог ошибок.
+Можно подключить первого платного клиента.
+6.22. Минимальный .env.example
+NODE_ENV=development
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/sylectus_bot
+REDIS_HOST=localhost
+REDIS_PORT=6379
+TELEGRAM_BOT_TOKEN=
+SYLECTUS_BASE_URL=
+SYLECTUS_API_KEY=
+SYLECTUS_ACCOUNT_ID=
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+ENCRYPTION_KEY_BASE64=
+SENTRY_DSN=
+
+6.23. Docker Compose
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sylectus_bot
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres_data:
+
+7. Приложения
+7.1. Сильная формула продукта
+Одна ниша
++ один дорогой workflow
++ один понятный результат
++ Telegram как привычный интерфейс
++ разрешённый источник данных
++ measurable ROI
+
+7.2. Что не делать в первой версии
+Не делать сложную карту.
+Не делать полноценную CRM.
+Не делать AI-chat без операционной необходимости.
+Не делать marketplace сразу.
+Не делать mobile app.
+Не делать сложный dashboard.
+Не делать automatic booking до проверки legal/business constraints.
+Не делать browser automation без разрешения.
+7.3. Что делать сразу
+Быстрые alerts.
+Качественные фильтры.
+True RPM.
+Deadhead.
+Broker blacklist.
+Saved loads.
+Daily report.
+Paid plan.
+7.4. Первый продажный скрипт
+I’m building a Telegram alert system for Sylectus loads.
+
+It filters loads by your trucks, pickup radius, RPM, deadhead and lanes,
+then sends only high-fit loads to your dispatcher.
+
+I’m onboarding 5 small fleets manually this week.
+Want me to set up a test filter for your current trucks?
+
+7.5. Источники и справочные ссылки
+В исходном обсуждении использовались публичные источники по возможностям Telegram, Sylectus и современным AI coding tools. Ссылки ниже приведены как справочные; перед коммерческой реализацией нужно проверить актуальные условия Sylectus, Telegram и платёжных провайдеров.
+Telegram Bot API: https://core.telegram.org/bots/api
+Telegram Mini Apps / Web Apps: https://core.telegram.org/bots/webapps
+Telegram Payments: https://core.telegram.org/bots/payments
+Sylectus Load Board overview: https://www.sylectus.net/solution-overview/load-board/
+Sylectus TMS overview: https://www.sylectus.net/solution-overview/transportation-management-systems/
+Cursor Rules documentation: https://cursor.com/docs/rules
+OpenAI Codex AGENTS.md guide: https://developers.openai.com/codex/guides/agents-md
+OpenAI Codex CLI documentation: https://developers.openai.com/codex/cli
+Claude Code best practices: https://code.claude.com/docs/en/best-practices

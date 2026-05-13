@@ -76,7 +76,7 @@ def install(project_dir: Path, components: list[str] = None):
     dst_prompt = project_dir / "PROMPT_LIBRARY.md"
     if prompt_lib.exists() and not dst_prompt.exists():
         shutil.copy2(prompt_lib, dst_prompt)
-        print(f"  ✅ PROMPT_LIBRARY.md")
+        print("  ✅ PROMPT_LIBRARY.md")
         total += 1
 
     print("-" * 40)

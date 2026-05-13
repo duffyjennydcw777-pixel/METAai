@@ -1,23 +1,19 @@
 import pytest
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock
 from datetime import datetime, timedelta, timezone
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.db.tables import User, Subscription, PointsTransaction
+from src.db.tables import User, Subscription
 from src.subscription import (
     get_plan,
     has_active_subscription,
     activate_trial,
     activate_subscription,
     get_active_subscription,
-    check_and_expire_subscriptions,
-    get_subscription_history,
     award_points,
     award_bid_streak_points,
-    get_points_history,
     PLANS,
-    TRIAL_DAYS,
-    TRIAL_TIER
+    TRIAL_DAYS
 )
 
 @pytest.fixture

@@ -5,7 +5,6 @@
 """
 import re
 from pathlib import Path
-from datetime import datetime, timedelta
 
 
 def parse_reviews(reviews_dir: Path) -> list[dict]:

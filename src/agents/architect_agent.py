@@ -4,7 +4,6 @@ Level 3. Использует Claude Sonnet.
 Анализирует код на архитектурные паттерны, интерфейсы, зависимости.
 """
 from datetime import datetime
-from pathlib import Path
 
 from .base import BaseAgent
 from .config import config

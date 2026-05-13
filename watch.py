@@ -10,7 +10,6 @@
 import asyncio
 import argparse
 import sys
-import time
 import hashlib
 from pathlib import Path
 from datetime import datetime
@@ -47,7 +46,7 @@ async def review_changed_file(filepath: Path, agent: ReviewAgent):
             print(f"   ⏭️ Слишком большой ({lines} строк), пропускаю")
             return
 
-        print(f"   🔍 Reviewing...", end=" ", flush=True)
+        print("   🔍 Reviewing...", end=" ", flush=True)
         response = await agent.review_file(filepath, context="Watch mode auto-review")
 
         # Extract score
@@ -72,18 +71,18 @@ async def watch_loop(directory: Path, pattern: str, level: int, interval: float)
     """Main watch loop."""
     agent = ReviewAgent()
     print(f"\n{'='*60}")
-    print(f"👁️  METAai Watch Mode")
+    print("👁️  METAai Watch Mode")
     print(f"{'='*60}")
     print(f"📁 Директория: {directory}")
     print(f"🔍 Паттерн:    {pattern}")
     print(f"⏱️  Интервал:    {interval}с")
     print(f"📊 Level:       {level}")
-    print(f"\n⏳ Сканирую файлы...")
+    print("\n⏳ Сканирую файлы...")
 
     # Initial scan
     prev_state = scan_files(directory, pattern)
     print(f"   Найдено {len(prev_state)} файлов")
-    print(f"\n👀 Слежу за изменениями... (Ctrl+C для выхода)\n")
+    print("\n👀 Слежу за изменениями... (Ctrl+C для выхода)\n")
 
     try:
         while True:
@@ -113,7 +112,7 @@ async def watch_loop(directory: Path, pattern: str, level: int, interval: float)
             prev_state = current_state
 
     except KeyboardInterrupt:
-        print(f"\n\n👋 Watch mode остановлен.")
+        print("\n\n👋 Watch mode остановлен.")
 
 
 def main():

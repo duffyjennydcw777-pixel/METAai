@@ -14,6 +14,8 @@
 | **Опыт** | `[Junior / Mid / Senior / Architect]` |
 | **Стиль общения** | `[Формальный / Casual / CTO-партнёр]` |
 | **Язык** | `[Русский / English / Mixed]` |
+| **Telegram** | `@IrattaRazma` |
+| **Telegram ID** | `923753958` |
 
 ## Сильные стороны
 

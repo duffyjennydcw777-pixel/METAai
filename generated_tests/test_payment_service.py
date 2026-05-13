@@ -1,6 +1,6 @@
 import pytest
 import asyncio
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock
 from aiogram.types import LabeledPrice
 from app.config import settings
 from app.services.payment_service import (

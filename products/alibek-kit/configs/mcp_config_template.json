@@ -1,0 +1,23 @@
+{
+    "mcpServers": {
+        "context7": {
+            "command": "C:\\Users\\ТВОЁ_ИМЯ\\AppData\\Roaming\\npm\\context7-mcp.cmd",
+            "args": []
+        },
+        "shadcn": {
+            "command": "C:\\Users\\ТВОЁ_ИМЯ\\AppData\\Roaming\\npm\\shadcn.cmd",
+            "args": ["mcp"]
+        },
+        "sequential-thinking": {
+            "command": "C:\\Users\\ТВОЁ_ИМЯ\\AppData\\Roaming\\npm\\mcp-server-sequential-thinking.cmd",
+            "args": []
+        },
+        "github": {
+            "command": "C:\\Users\\ТВОЁ_ИМЯ\\AppData\\Roaming\\npm\\mcp-server-github.cmd",
+            "args": [],
+            "env": {
+                "GITHUB_PERSONAL_ACCESS_TOKEN": "ВСТАВЬ_СВОЙ_ТОКЕН_СЮДА"
+            }
+        }
+    }
+}

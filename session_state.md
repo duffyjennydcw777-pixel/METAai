@@ -1,33 +1,44 @@
-# 🧠 Session State — 2026-05-08 02:55
+# 🧠 Session State — 2026-05-10 18:15
 
-## 🎯 Текущая задача
-Solo CTO OS — payment infrastructure v2.0 задеплоен и работает.
+## 🎯 Текущая сессия
+Сборка и отправка Vibecoding Kit для Алибека (@aivengo23, chat_id: 5930391280).
 
-## ✅ Завершено (сессия 2026-05-08)
-1. **Payment Service v2.0** — unified (delivery_bot + payment_service), идемпотентность, auto-delivery ZIP
-2. **HTTPS proxy** — nginx `/pay/` → `:8002` на `ironyx.tech`, mixed content решён
-3. **Лендинг** — HTTPS URLs, success.html обновлён, pushed на GitHub Pages
-4. **systemd** — active (running), enabled, auto-restart
-5. **ZIP на сервере** — `solocto-os-pro-v1.0.zip` рядом с `main.py`
-6. **CHANGELOG** — v2.0 добавлен
+## ✅ Завершено (сессия 2026-05-10)
+
+### Демо для Сослана и Алана (предыдущая сессия)
+- Создан HTML "AI — Серьёзный Инструмент" — презентация для гостей
+- Показан FamilyQuest, инфраструктура, архитектура
+
+### Консолидация проектов (предыдущая сессия)
+- Спланирована миграция 19 проектов в `C:\Dev\`
+- Анализ помещения для студии Пилатеса (Авито)
+
+### Alibek Full Kit v1.0
+1. **INSTALL_GUIDE.md** — пошаговая установка среды (VS Code, Node, Python, Git, Gemini, MCP)
+2. **CAPABILITIES.html** — красивая HTML-презентация возможностей
+3. **Конфиги** — GEMINI.md, mcp_config_template.json, agent-rules/ (MAKER_PROFILE, GLOBAL, PROJECT)
+4. **build_alibek_kit.py** — скрипт сборки полного ZIP (SoloCTO OS + метаинженерия + персональные файлы)
+5. **send_to_alibek.py** — скрипт отправки в Telegram (chat_id прописан)
+6. **find_chat_id.py** — утилита поиска chat_id по username
+7. **ZIP собран** — `alibek-full-kit-v1.0.zip` (110 KB, 68 файлов)
+8. **Отправка** — бот не может писать первым, нужно отправить ZIP вручную через Telegram
+
+### Environment Setup Walkthrough
+- Артефакт с полным разбором процесса установки (Mermaid диаграммы, MCP архитектура, файловая структура)
 
 ## ⏳ Ожидание
-- CryptoCloud production mode — заявка на рассмотрении (подана 7 мая)
+- CryptoCloud production mode — заявка на рассмотрении
+- Алибек должен написать /start боту для автоматической отправки (или отправить ZIP вручную)
 
-## 📍 Ключевые URLs
-- Health: `https://api.ironyx.tech/pay/health`
-- Checkout: `https://api.ironyx.tech/pay/checkout/solocto`
-- Webhook: `https://api.ironyx.tech/pay/webhook/cryptocloud`
-- Landing: `https://duffyjennydcw777-pixel.github.io/solocto-os/`
-
-## 🏗️ Инфраструктура
-- Сервер: `92.246.137.35` (SSH через Jump Host `65.109.58.108`, порт 2222)
-- Payment service: `/root/payment_service/` (systemd: `payment-service.service`)
-- Nginx: `/etc/nginx/sites-enabled/ironyx.tech` (добавлен `/pay/` proxy)
+## 📍 Ключевые файлы (эта сессия)
+- Kit: `METAai/products/alibek-kit/`
+- Build: `METAai/products/build_alibek_kit.py`
+- Send: `METAai/products/send_to_alibek.py`
+- ZIP: `METAai/products/dist/alibek-full-kit-v1.0.zip`
 
 ## 📝 TODO (следующая сессия)
 - [ ] Проверить CryptoCloud production status
 - [ ] Тестовая покупка через кнопку Buy
-- [ ] Коммит METAai repo (если не сделан)
-- [ ] Подумать: email-доставка (Resend/Mailgun) для покупателей без TG
-- [ ] Git cleanup: 17 untracked + 6 unstaged файлов в METAai repo
+- [ ] Git cleanup: коммит METAai repo
+- [ ] Подумать: email-доставка для покупателей без TG
+- [ ] Проверить получил ли Алибек ZIP и нужна ли помощь с установкой

@@ -24,6 +24,10 @@
 import asyncio
 import argparse
 import sys
+
+if sys.stdout.encoding != "utf-8":
+    sys.stdout.reconfigure(encoding="utf-8")
+
 import logging
 from pathlib import Path
 
@@ -31,7 +35,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 from agents.config import config
-from agents.review_agent import ReviewAgent, get_git_diff
+from agents.review_agent import get_git_diff
 from agents.preflight_agent import PreflightAgent
 from agents.orchestrator import AgentOrchestrator
 from agents.test_gen_agent import TestGenAgent
@@ -190,7 +194,7 @@ async def cmd_fix(args):
             sys.exit(1)
 
     print(f"\n{'='*60}")
-    print(f"🔧 Generated Fixes")
+    print("🔧 Generated Fixes")
     print(f"{'='*60}")
     print(fixes)
     print(f"{'='*60}")

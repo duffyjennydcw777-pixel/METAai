@@ -211,6 +211,23 @@ async def health():
     }
 
 
+# ── Spots counter (for landing page urgency) ────────────────────────────
+TOTAL_LAUNCH_SPOTS = 50
+
+@app.get("/pay/spots")
+async def spots():
+    """Returns remaining launch-price spots for the landing page counter."""
+    processed = _load_processed()
+    # Count only solocto purchases (not promptkit)
+    sold = sum(1 for oid in processed if oid.startswith("solocto"))
+    remaining = max(0, TOTAL_LAUNCH_SPOTS - sold)
+    return {
+        "total": TOTAL_LAUNCH_SPOTS,
+        "sold": sold,
+        "remaining": remaining,
+    }
+
+
 # ── Telegram helpers ─────────────────────────────────────────────────────
 async def _send_tg(text: str, chat_id: str = None):
     """Send Telegram message (async, fire-and-forget)."""

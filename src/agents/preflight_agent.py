@@ -3,10 +3,7 @@
 Проверяет конфиги, .env, порты, зависимости перед деплоем.
 """
 import subprocess
-import os
 from pathlib import Path
-from datetime import datetime
-from typing import Optional
 
 from .base import BaseAgent
 from .config import config

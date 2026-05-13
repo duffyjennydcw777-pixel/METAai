@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🚀 Вайбкодинг — Возможности Среды</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#0a0a0f;--surface:#12121a;--card:#1a1a2e;
+--primary:#6366f1;--accent:#22d3ee;--success:#10b981;--warning:#f59e0b;
+--text:#e2e8f0;--muted:#64748b;
+--glow:0 0 30px rgba(99,102,241,0.3);
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(99,102,241,0.15),transparent 70%);top:-100px;right:-100px;border-radius:50%}
+.hero::after{content:'';position:absolute;width:400px;height:400px;background:radial-gradient(circle,rgba(34,211,238,0.1),transparent 70%);bottom:-50px;left:-50px;border-radius:50%}
+.hero h1{font-size:clamp(2.5rem,6vw,4.5rem);font-weight:900;background:linear-gradient(135deg,#6366f1,#22d3ee,#10b981);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1rem;position:relative;z-index:1}
+.hero .subtitle{font-size:1.3rem;color:var(--muted);max-width:600px;position:relative;z-index:1}
+.badge{display:inline-block;padding:.4rem 1rem;background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:50px;font-size:.85rem;font-weight:600;margin-bottom:2rem;position:relative;z-index:1}
+.scroll-hint{position:absolute;bottom:2rem;animation:bounce 2s infinite;font-size:1.5rem;z-index:1}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(10px)}}
+section{padding:4rem 2rem;max-width:1000px;margin:0 auto}
+h2{font-size:2rem;font-weight:700;margin-bottom:2rem;text-align:center}
+h2 span{background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-bottom:3rem}
+.card{background:var(--card);border-radius:16px;padding:1.8rem;border:1px solid rgba(255,255,255,0.06);transition:all .3s ease;position:relative;overflow:hidden}
+.card:hover{transform:translateY(-4px);box-shadow:var(--glow);border-color:rgba(99,102,241,0.3)}
+.card .icon{font-size:2.5rem;margin-bottom:1rem}
+.card h3{font-size:1.2rem;font-weight:700;margin-bottom:.5rem;color:var(--accent)}
+.card p{color:var(--muted);font-size:.95rem}
+.demo{background:var(--surface);border-radius:12px;padding:1.5rem;margin:1.5rem 0;border:1px solid rgba(255,255,255,0.05)}
+.demo-header{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;color:var(--accent);font-weight:600}
+.demo code{display:block;background:var(--bg);padding:1rem;border-radius:8px;font-family:'Cascadia Code','Fira Code',monospace;font-size:.85rem;color:#a5b4fc;overflow-x:auto;white-space:pre}
+.stack{display:flex;flex-wrap:wrap;gap:.8rem;justify-content:center;margin:2rem 0}
+.stack-item{display:flex;align-items:center;gap:.5rem;padding:.6rem 1.2rem;background:var(--card);border-radius:50px;border:1px solid rgba(255,255,255,0.08);font-size:.9rem;transition:all .3s}
+.stack-item:hover{border-color:var(--primary);background:rgba(99,102,241,0.1)}
+.timeline{position:relative;padding-left:2rem;border-left:2px solid var(--primary)}
+.timeline-item{margin-bottom:2rem;position:relative}
+.timeline-item::before{content:'';position:absolute;left:-2.35rem;top:.3rem;width:12px;height:12px;background:var(--primary);border-radius:50%;border:2px solid var(--bg)}
+.timeline-item h3{color:var(--accent);margin-bottom:.3rem}
+.timeline-item p{color:var(--muted);font-size:.9rem}
+.cta{text-align:center;padding:4rem 2rem;background:linear-gradient(180deg,transparent,rgba(99,102,241,0.05))}
+.cta-btn{display:inline-block;padding:1rem 2.5rem;background:linear-gradient(135deg,var(--primary),#8b5cf6);border-radius:12px;color:white;text-decoration:none;font-weight:700;font-size:1.1rem;transition:all .3s;box-shadow:0 4px 20px rgba(99,102,241,0.4)}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(99,102,241,0.5)}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin:2rem 0}
+.compare-col{padding:1.5rem;border-radius:12px}
+.compare-col.old{background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.2)}
+.compare-col.new{background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.2)}
+.compare-col h3{margin-bottom:1rem;font-size:1.1rem}
+.compare-col.old h3{color:#ef4444}
+.compare-col.new h3{color:#10b981}
+.compare-col li{list-style:none;padding:.3rem 0;font-size:.9rem;color:var(--muted)}
+footer{text-align:center;padding:2rem;color:var(--muted);font-size:.85rem;border-top:1px solid rgba(255,255,255,0.05)}
+@media(max-width:600px){.compare{grid-template-columns:1fr}.hero h1{font-size:2rem}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="badge">🎁 Персональный пакет от дяди Георгия</div>
+  <h1>Вайбкодинг<br>Среда Разработки</h1>
+  <p class="subtitle">AI пишет код за тебя. Ты управляешь процессом. Вот все инструменты, которые мы используем — и теперь они твои.</p>
+  <div class="scroll-hint">↓</div>
+</div>
+
+<section>
+  <h2>⚡ Что такое <span>Вайбкодинг?</span></h2>
+  <div class="compare">
+    <div class="compare-col old">
+      <h3>❌ Раньше</h3>
+      <ul>
+        <li>📚 Учишь языки программирования годами</li>
+        <li>⌨️ Пишешь каждую строку вручную</li>
+        <li>🐛 Часами ищешь ошибки</li>
+        <li>📖 Читаешь документацию на английском</li>
+        <li>😤 Долго, сложно, скучно</li>
+      </ul>
+    </div>
+    <div class="compare-col new">
+      <h3>✅ Вайбкодинг</h3>
+      <ul>
+        <li>💬 Описываешь что хочешь на русском</li>
+        <li>🤖 AI пишет код за тебя</li>
+        <li>🔧 AI сам находит и чинит баги</li>
+        <li>📚 AI сам читает документацию</li>
+        <li>🚀 Быстро, весело, результат</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>🛠️ Наш <span>Стек</span></h2>
+  <div class="stack">
+    <div class="stack-item">🖥️ VS Code</div>
+    <div class="stack-item">🤖 Gemini Code Assist</div>
+    <div class="stack-item">📚 Context7 MCP</div>
+    <div class="stack-item">🎨 Shadcn MCP</div>
+    <div class="stack-item">🐙 GitHub MCP</div>
+    <div class="stack-item">🐍 Python</div>
+    <div class="stack-item">⚡ Node.js</div>
+    <div class="stack-item">📦 Git</div>
+  </div>
+</section>
+
+<section>
+  <h2>🔥 <span>Возможности</span></h2>
+  <div class="grid">
+    <div class="card">
+      <div class="icon">💬</div>
+      <h3>Чат с AI прямо в редакторе</h3>
+      <p>Пишешь на русском — AI создаёт код, файлы, проекты. Полноценный напарник, который не устаёт и не забывает.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📚</div>
+      <h3>Живая документация</h3>
+      <p>Context7 MCP — AI читает актуальную документацию ЛЮБОЙ библиотеки в реальном времени. Не из памяти 2024 года, а свежую.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🌐</div>
+      <h3>Браузер-агент</h3>
+      <p>AI может открывать сайты, кликать кнопки, заполнять формы, делать скриншоты. Автоматизация на максимум.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🐙</div>
+      <h3>GitHub из чата</h3>
+      <p>Создавать репозитории, пушить код, делать PR — всё через диалог с AI. Не нужно учить команды git.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🎨</div>
+      <h3>Генерация изображений</h3>
+      <p>AI создаёт картинки, иконки, мокапы прямо по описанию. Не нужен Photoshop.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🧠</div>
+      <h3>Память между сессиями</h3>
+      <p>Knowledge Items — AI помнит твои решения, паттерны, ошибки. Становится умнее с каждым проектом.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🎯</div>
+      <h3>Правила проекта</h3>
+      <p>.agent/rules/ — AI читает правила ТВОЕГО проекта и следует им. Не генерит generic ответы.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔍</div>
+      <h3>Поиск в интернете</h3>
+      <p>AI может гуглить, читать страницы, анализировать конкурентов — всё из чата.</p>
+    </div>
+    <div class="card">
+      <div class="icon">⚡</div>
+      <h3>Команды в терминале</h3>
+      <p>AI запускает команды, устанавливает пакеты, запускает серверы. Ты только подтверждаешь.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>💡 <span>Примеры</span> что можно сделать</h2>
+
+  <div class="demo">
+    <div class="demo-header">💬 Пример 1: Создать лендинг</div>
+    <code>Ты: "Создай красивый лендинг для магазина кроссовок.
+Тёмная тема, неоновые акценты, анимации при скролле."
+
+AI: *создаёт полный HTML/CSS/JS файл с работающим сайтом*</code>
+  </div>
+
+  <div class="demo">
+    <div class="demo-header">💬 Пример 2: Telegram бот</div>
+    <code>Ты: "Сделай Telegram бота, который отвечает
+на вопросы по моему прайс-листу"
+
+AI: *создаёт бота на Python, настраивает webhook,
+деплоит на сервер*</code>
+  </div>
+
+  <div class="demo">
+    <div class="demo-header">💬 Пример 3: Веб-приложение</div>
+    <code>Ты: "Создай приложение для учёта расходов.
+React, тёмная тема, графики."
+
+AI: *создаёт проект на Vite + React, компоненты,
+графики на Recharts, localStorage*</code>
+  </div>
+
+  <div class="demo">
+    <div class="demo-header">💬 Пример 4: Анализ</div>
+    <code>Ты: "Открой avito.ru, найди квартиры во Владикавказе
+до 3 млн, составь таблицу"
+
+AI: *открывает браузер, парсит данные, создаёт таблицу*</code>
+  </div>
+</section>
+
+<section>
+  <h2>📈 <span>Roadmap</span> — Твой путь</h2>
+  <div class="timeline">
+    <div class="timeline-item">
+      <h3>Неделя 1-2: Фундамент</h3>
+      <p>Установка среды, первый проект, знакомство с AI-чатом. Создай простой лендинг.</p>
+    </div>
+    <div class="timeline-item">
+      <h3>Неделя 3-4: Навыки</h3>
+      <p>Освой промпт-инженерию. Научись давать AI правильные задания. Создай 2-3 проекта.</p>
+    </div>
+    <div class="timeline-item">
+      <h3>Месяц 2: Уверенность</h3>
+      <p>Telegram боты, веб-приложения, работа с API. Настрой правила проектов.</p>
+    </div>
+    <div class="timeline-item">
+      <h3>Месяц 3+: Мастерство</h3>
+      <p>Деплой на сервер, GitHub, автоматизация. Ты уже полноценный вайбкодер.</p>
+    </div>
+  </div>
+</section>
+
+<div class="cta">
+  <h2 style="margin-bottom:1rem">Готов начать? 🚀</h2>
+  <p style="color:var(--muted);margin-bottom:2rem;max-width:500px;margin-left:auto;margin-right:auto">Открой INSTALL_GUIDE.md и следуй инструкции. Через 30 минут у тебя будет работающая среда.</p>
+  <a href="INSTALL_GUIDE.md" class="cta-btn">📖 Открыть инструкцию</a>
+</div>
+
+<footer>
+  Собрано с ❤️ дядей Георгием и AI · Май 2026
+</footer>
+
+</body>
+</html>

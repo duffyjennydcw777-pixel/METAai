@@ -2,13 +2,11 @@
 🎖️ Agent Orchestrator — Диспетчер агентов.
 Определяет уровень сложности → вызывает нужных агентов.
 """
-import asyncio
 import logging
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-from .config import config
 from .review_agent import ReviewAgent, get_git_diff
 from .preflight_agent import PreflightAgent
 from .security_agent import SecurityAgent
@@ -42,7 +40,8 @@ class AgentOrchestrator:
 
         Level 1 (Trivial): No agents needed, just local checks
         Level 2 (Standard): Review Agent
-        Level 3 (Complex): Review + Preflight + (Security, Test — future)
+        Level 3 (Complex): Review + Preflight + Security
+        Level 4 (Full Project): All 10 agents (Architect, Business, UX, etc.) via audit_project
         """
         start = datetime.now()
         results = {

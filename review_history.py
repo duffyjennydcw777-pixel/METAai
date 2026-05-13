@@ -110,7 +110,7 @@ if __name__ == "__main__":
         print(f"  ⏭️  Skipped (no IG):  {stats['skipped_reviews']}")
         print(f"  💰 Money saved:       ${stats['money_saved']:.2f}")
         if stats["worst_files"]:
-            print(f"\n  📉 Worst scoring files:")
+            print("\n  📉 Worst scoring files:")
             for name, score in stats["worst_files"]:
                 print(f"      {name}: {score}/100")
         print("=" * 50)

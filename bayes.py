@@ -6,7 +6,6 @@ P(bug|file) = prior × likelihood / evidence.
 Uses Bayesian updating: each review updates our belief about file quality.
 """
 import json
-import math
 from pathlib import Path
 from datetime import datetime
 
