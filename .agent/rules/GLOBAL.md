@@ -2,7 +2,7 @@
 
 > Эти правила загружаются AI-агентом ПЕРВЫМИ при каждом ответе.
 > Нарушение = ПРОВАЛ.
-> Связанные файлы: `MODES.md`, `CODE_COMPLEXITY.md`, `CONVENTIONS.md`, `MAKER_PROFILE.md`, `PROJECT.md`.
+> Связанные файлы: `MODES.md`, `CODE_COMPLEXITY.md`, `CONVENTIONS.md`, `MAKER_PROFILE.md`, `PROJECT.md`, `ODAF.md`.
 
 ---
 
@@ -13,6 +13,7 @@
 3. **Anti-Pattern Registry**: ПЕРЕД деплоем, SSH, Python/datetime кодом — сверяться с `knowledge/ai-anti-patterns/artifacts/anti-patterns.md`.
 4. **MODES.md**: AI ОБЯЗАН загружать режимы мышления из `.agent/rules/MODES.md`. Указывать текущий режим в ответе: `🎭 Режим: [название]`.
 5. **REFLEXION_LOG.md**: При стратегических решениях (Шахматы/Штаб/Торговец) — сверяться с `REFLEXION_LOG.md`. Не повторять стратегические ошибки.
+6. **ODAF.md**: При ЛЮБОМ аналитическом, стратегическом или диагностическом запросе — применять ODAF-фреймворк (Outcome → Data → Action → Format). Использовать готовые шаблоны из `ODAF.md` (#1-#12).
 
 ---
 
