@@ -4,13 +4,18 @@
 
 ---
 
-## [2026-05-17] - AI Agent - Phase 8: Intelligence Feeds 📡
+## [2026-05-17] - AI Agent - Phase 8: Intelligence Feeds 📡 (LIVE)
 
 ### Новые агенты
-- **🔭 TrustMRR Scraper** (`trustmrr_scraper.py`) — живой парсинг стартап-листингов
-- **🏪 Acquire Scanner** (`acquire_scanner.py`) — M&A лоты с Acquire.com
-- **🚀 ProductHunt Tracker** (`ph_tracker.py`) — тренды и голоса
-- **📡 Feed Aggregator** (`feed_aggregator.py`) — объединяет все фиды
+- **🔭 TrustMRR Scraper** (`trustmrr_scraper.py`) — SSR HTML парсинг (Strategy 1: h3+font-mono), 60 стартапов, 50 с MRR
+- **🏪 Acquire Scanner** (`acquire_scanner.py`) — M&A через TrustMRR fallback (Acquire.com = SPA/auth-gated)
+- **🚀 ProductHunt Tracker** (`ph_tracker.py`) — Apollo SSR stream (Strategy 2), 23 продукта с taglines
+- **📡 Feed Aggregator** (`feed_aggregator.py`) — объединяет 143 элемента, детектит дешёвые сделки (<6× MRR)
+
+### Результаты
+- TrustMRR: Revenue 30d, MRR, Total для 50 стартапов (Rezi $294k MRR, 1Lookup $269k MRR)
+- ProductHunt: Vivago, Fere AI, Kirki, Agentmemory, Gemini 3.1 Flash-Lite
+- Сигналы: 3 дешёвых сделки (Speel.co 2.7×, PROSP 4.0×, anonymous-startup-2 4.4×)
 
 ### Улучшения
 - **Conductor v8** — `--phase8`, `--feeds`, 30 agents total
