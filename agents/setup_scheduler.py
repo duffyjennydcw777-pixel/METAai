@@ -13,10 +13,15 @@
     python agents/setup_scheduler.py --status # Проверить статус
 """
 
+import platform
 import subprocess
 import sys
 
 from pathlib import Path
+
+if platform.system() != "Windows":
+    print("❌ Этот скрипт работает только на Windows (Task Scheduler)")
+    sys.exit(1)
 
 TASK_NAME = "METAai_NightlyAgents"
 PYTHON_PATH = sys.executable
