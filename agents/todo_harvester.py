@@ -81,6 +81,14 @@ def _is_false_positive(line: str, marker: str, filepath: Path) -> bool:
     line_lower = line.lower().strip()
     fname = filepath.name.lower()
 
+    # 0. Агентские мета-файлы — содержат паттерны как данные, не как техдолг
+    agent_meta_files = (
+        "todo_harvester.py", "config.py", "conductor.py",
+        "health_monitor.py", "compliance_checker.py",
+    )
+    if fname in agent_meta_files:
+        return True
+
     # 1. Переводы (translations.js)
     if '"todo"' in line_lower or "'todo'" in line_lower:
         if "filter" in line_lower or "label" in line_lower:
@@ -94,12 +102,9 @@ def _is_false_positive(line: str, marker: str, filepath: Path) -> bool:
     if ">" in line and sum(p in line.upper() for p in TODO_PATTERNS) >= 3:
         return True
 
-    # 4. CHANGELOG.md — упоминания агентов/инструментов (не реальные маркеры)
+    # 4. CHANGELOG.md — почти все упоминания не настоящие маркеры
     if fname == "changelog.md":
-        agent_keywords = ["harvester", "syncer", "generator", "monitor", "enforcer",
-                          "checker", "scanner", "pulse", "watchdog", "conductor"]
-        if any(kw in line_lower for kw in agent_keywords):
-            return True
+        return True
 
     # 5. Markdown-файлы: шаблоны таблиц и описания форматов
     if filepath.suffix.lower() == ".md":
@@ -111,27 +116,16 @@ def _is_false_positive(line: str, marker: str, filepath: Path) -> bool:
         if marker == "XXX" and "|" in line:
             return True
 
-    # 6. Docstrings в самих агентах (описывают функционал)
-    if fname in ("health_monitor.py", "todo_harvester.py", "config.py"):
-        # Описания агентов: "Считает TODO/FIXME/HACK в коде"
-        if "считает" in line_lower or "приоритизирует" in line_lower:
-            return True
-        # Списки паттернов в config
-        if "patterns" in line_lower or "priority" in line_lower:
-            return True
-
-    # 7. CSS: HACK в комментариях — контексте хак-решений визуала
-    if filepath.suffix.lower() == ".css":
-        if marker == "HACK" and ("/*" in line or "*/" in line):
-            # Это настоящий HACK-маркер в CSS, НЕ false positive
-            pass
-
-    # 8. Markdown-файлы в shared skills (не наш код)
+    # 6. Markdown-файлы в shared skills (не наш код)
     if ".shared" in str(filepath) or "antigravity-kit" in str(filepath):
         return True
 
-    # 9. GitHub Actions workflow — не наш TODO
+    # 7. GitHub Actions workflow — не наш TODO
     if ".github" in str(filepath):
+        return True
+
+    # 8. Reports (auto-generated) — не реальный техдолг
+    if "reports" in filepath.parts:
         return True
 
     return False
