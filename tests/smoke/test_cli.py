@@ -17,7 +17,8 @@ def run_cli(*args, expect_rc=0, timeout=30):
     cmd = [PYTHON, REVIEW_PY] + list(args)
     result = subprocess.run(
         cmd, capture_output=True, text=True, timeout=timeout,
-        cwd=str(Path(REVIEW_PY).parent)
+        cwd=str(Path(REVIEW_PY).parent),
+        encoding="utf-8", errors="replace",
     )
     if expect_rc is not None:
         assert result.returncode == expect_rc, (
@@ -73,7 +74,8 @@ class TestNoAPIKeyGraceful:
         cmd = [PYTHON, REVIEW_PY, "review", "--file", REVIEW_PY]
         result = subprocess.run(
             cmd, capture_output=True, text=True, timeout=15,
-            env=env, cwd=str(Path(REVIEW_PY).parent)
+            env=env, cwd=str(Path(REVIEW_PY).parent),
+            encoding="utf-8", errors="replace",
         )
         # Должен быть или exit(1) с сообщением, или graceful failure
         # НЕ должен быть traceback
@@ -117,7 +119,8 @@ class TestCostsModule:
         cmd = [PYTHON, "-c", "import sys; sys.path.insert(0,'.'); from costs import *; print('OK')"]
         result = subprocess.run(
             cmd, capture_output=True, text=True, timeout=10,
-            cwd=str(Path(REVIEW_PY).parent)
+            cwd=str(Path(REVIEW_PY).parent),
+            encoding="utf-8", errors="replace",
         )
         assert "OK" in result.stdout
 
@@ -137,6 +140,7 @@ print('OK')
 """]
         result = subprocess.run(
             cmd, capture_output=True, text=True, timeout=10,
-            cwd=str(Path(REVIEW_PY).parent)
+            cwd=str(Path(REVIEW_PY).parent),
+            encoding="utf-8", errors="replace",
         )
         assert "OK" in result.stdout, f"stderr: {result.stderr[:500]}"
