@@ -1,6 +1,6 @@
 """
 METAai Agents — Конфигурация
-Единый источник правды для всех агентов Фазы 1.
+Единый источник правды для всех агентов (Phase 1 + Phase 2).
 """
 from pathlib import Path
 from datetime import timedelta

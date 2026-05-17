@@ -4,6 +4,37 @@
 
 ---
 
+## [2026-05-17] - AI Agent - Phase 2: Deep Analysis Agents 📊
+
+### Новые агенты
+- **🏥 Health Monitor** (`health_monitor.py`) — полный анализ здоровья проектов
+  - LOC подсчёт по языкам, git-активность за 30 дней
+  - Поиск TODO/FIXME/HACK маркеров + примеры
+  - Оценка документации (README полнота, CHANGELOG записи)
+  - Health Score 0-100% с категоризацией проблем
+- **📋 Changelog Enforcer** (`changelog_enforcer.py`) — контроль CHANGELOG
+  - Обнаружение коммитов 5+ файлов без записи в CHANGELOG
+  - `--fix` генерация шаблонов для пропущенных записей
+  - Покрытие CHANGELOG в % по проекту
+- **🔍 Dependency Scanner** (`dependency_scanner.py`) — аудит зависимостей
+  - Python (pyproject.toml, requirements.txt) + Node (package.json)
+  - Проверка pinning, lock-файлов, venv
+  - `--audit` опциональная проверка уязвимостей
+
+### Улучшения
+- **Conductor v2** — поддержка `--phase1` / `--phase2` флагов, итоговая таблица
+- **Timeout** увеличен 60→120с для тяжёлых агентов
+- **.gitignore** — исключены PDF, .docx, legacy-скрипты
+- **ruff.toml** — исключены legacy one-off скрипты из линтинга
+- **setup_scheduler.py** — переписан на XML-based Task Scheduler с WorkingDirectory
+
+### Техдолг
+- FreshCut: добавлен `.gitignore`
+- OBSIDIAN_AUDIT: 6/6 TODO закрыто
+- Main Dashboard: обновлён (FreshCut, ODAF actions, Phase 1 статус)
+
+---
+
 ## [2026-05-17] - AI Agent - Phase 1: Automated Governance System 🤖
 
 ### Новое — Агентная инфраструктура (`agents/`)

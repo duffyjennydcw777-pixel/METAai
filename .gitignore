@@ -48,3 +48,31 @@ out/
 *.tmp
 *.bak
 scratch/
+
+# Generated PDFs & Office docs (не хранить в git)
+*.pdf
+*.docx
+*.odt
+
+# One-off data files
+*.json
+!package.json
+!tsconfig.json
+session_text.txt
+odt_content.txt
+omi_content.txt
+satori_report.html
+
+# Agent reports (генерируются автоматически)
+agents/reports/
+
+# Legacy one-off scripts (не core)
+make_*.py
+read_*.py
+extract_*.py
+server_audit.py
+query_users.py
+audit.sh
+ssh_tunnel_postgres.bat
+test_pg.py
+

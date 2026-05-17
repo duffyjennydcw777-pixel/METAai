@@ -1,0 +1,18 @@
+# Ruff config for METAai
+
+[lint]
+# Игнорируем legacy one-off скрипты
+exclude = [
+    "make_*.py",
+    "read_*.py",
+    "extract_*.py",
+    "server_audit.py",
+    "query_users.py",
+    "test_pg.py",
+]
+
+# Правила которые допустимо игнорировать в legacy
+ignore = [
+    "E402",   # Module level import not at top (допустимо в скриптах с auto-install)
+    "E741",   # Ambiguous variable name (l, O, I) — в one-off скриптах OK
+]
