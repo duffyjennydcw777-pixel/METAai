@@ -1,15 +1,16 @@
 """
-🎼 Conductor v5 — Мастер-процесс для всех агентов
-Запускает все агенты Phase 1-5, агрегирует результаты.
+🎼 Conductor v6 — Мастер-процесс для всех агентов
+Запускает все 22 агента Phase 1-6, агрегирует результаты.
 
 Использование:
     python -m agents.conductor                 # Запустить все агенты
     python -m agents.conductor --fix           # Запустить + авто-фикс (Phase 1)
     python -m agents.conductor --save          # Сохранить все отчёты
-    python -m agents.conductor --phase1-5      # Только конкретная фаза
+    python -m agents.conductor --phase1-6      # Только конкретная фаза
     python -m agents.conductor --fix-all       # Phase 1+3 fix + Phase 4 auto-commit
     python -m agents.conductor --notify        # Telegram report
     python -m agents.conductor --sprint        # Sprint Planner
+    python -m agents.conductor --release       # Release Manager (--tag для создания)
     python -m agents.conductor --digest        # Weekly Digest
     python -m agents.conductor --kill-all      # Kill switch
 """
@@ -61,8 +62,8 @@ def main():
 
     now = datetime.now()
     print("\n" + "╔" + "═" * 58 + "╗")
-    print("║" + "  🎼 CONDUCTOR v5 — Meta-Engineering Agent Orchestrator".center(58) + "║")
-    print("║" + f"  Phase 1-5 | 18 agents | {now.strftime('%Y-%m-%d %H:%M:%S')}".center(58) + "║")
+    print("║" + "  🎼 CONDUCTOR v6 — Meta-Engineering Agent Orchestrator".center(58) + "║")
+    print("║" + f"  Phase 1-6 | 22 agents | {now.strftime('%Y-%m-%d %H:%M:%S')}".center(58) + "║")
     print("╚" + "═" * 58 + "╝")
 
     extra = []
@@ -76,11 +77,14 @@ def main():
     phase3_only = "--phase3" in args
     phase4_only = "--phase4" in args
     phase5_only = "--phase5" in args
+    phase6_only = "--phase6" in args
     do_digest = "--digest" in args
     do_notify = "--notify" in args
     do_sprint = "--sprint" in args
+    do_release = "--release" in args
     run_all = not any([phase1_only, phase2_only, phase3_only, phase4_only,
-                       phase5_only, do_digest, do_notify, do_sprint])
+                       phase5_only, phase6_only, do_digest, do_notify,
+                       do_sprint, do_release])
     fix_all = "--fix-all" in args
 
     results = {}
@@ -232,6 +236,41 @@ def main():
         print_banner("🗂️ Agent #16: Sprint Planner")
         sprint_args = ["--save"] if "--save" in args else []
         results["sprint"] = run_agent("sprint_planner", sprint_args)
+
+    # ═══════════════════════════════════════════════════════
+    # PHASE 6: Mastery
+    # ═══════════════════════════════════════════════════════
+    if run_all or phase6_only:
+        print("\n" + "█" * 60)
+        print("  🧬 PHASE 6 — Mastery")
+        print("█" * 60)
+
+        # Agent #19: Git Analytics
+        print_banner("📊 Agent #19: Git Analytics")
+        ga_args = ["--save"] if "--save" in args else []
+        results["git_analytics"] = run_agent("git_analytics", ga_args)
+
+        # Agent #20: Cost Monitor
+        print_banner("💲 Agent #20: Cost Monitor")
+        cm_args = ["--save"] if "--save" in args else []
+        results["cost_monitor"] = run_agent("cost_monitor", cm_args)
+
+        # Agent #21: Release Manager
+        print_banner("🏷️ Agent #21: Release Manager")
+        results["release"] = run_agent("release_manager", [])
+
+        # Agent #22: Knowledge Distiller
+        print_banner("🧬 Agent #22: Knowledge Distiller")
+        kd_args = ["--save"] if "--save" in args else []
+        results["knowledge"] = run_agent("knowledge_distiller", kd_args)
+
+    # Standalone triggers
+    if do_release:
+        print_banner("🏷️ Agent #21: Release Manager")
+        rm_args = ["--tag"] if "--tag" in args else []
+        if "--save" in args:
+            rm_args.append("--save")
+        results["release"] = run_agent("release_manager", rm_args)
 
     # ═══════════════════════════════════════════════════════
     # SUMMARY

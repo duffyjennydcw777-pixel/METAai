@@ -4,6 +4,20 @@
 
 ---
 
+## [2026-05-17] - AI Agent - Phase 6: Mastery 🧬
+
+### Новые агенты
+- **📊 Git Analytics** (`git_analytics.py`) — velocity, bus factor, stale branches, code metrics
+- **💲 Cost Monitor** (`cost_monitor.py`) — трекинг API расходов из review-логов
+- **🏷️ Release Manager** (`release_manager.py`) — авто-тегирование по conventional commits
+- **🧬 Knowledge Distiller** (`knowledge_distiller.py`) — извлечение паттернов → Obsidian
+
+### Улучшения
+- **Conductor v6** — `--phase6`, `--release`, 22 agents total
+- **Config** — GIT_STALE_BRANCH_DAYS, COST_*, RELEASE_LOG, KNOWLEDGE_DIR
+
+---
+
 ## [2026-05-17] - AI Agent - Phase 5: Outreach 📡
 
 ### Новые агенты

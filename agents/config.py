@@ -11,6 +11,7 @@ from datetime import timedelta
 
 SECOND_BRAIN = Path(r"C:\Users\Gigabyte\Second_Brain")
 DEV_ROOT = Path(r"C:\Dev")
+ROOT = DEV_ROOT / "METAai"
 
 # Все активные проекты (добавляй новые сюда)
 PROJECTS = {
@@ -194,3 +195,20 @@ SPRINT_EFFORT = {"S": "< 1 час", "M": "1-4 часа", "L": "4+ часов"}
 
 # Portfolio Tracker
 BUSINESS_METRICS_FILE = SECOND_BRAIN / "06_Business" / "BUSINESS_METRICS.md"
+
+# ═══════════════════════════════════════════════════════════
+# PHASE 6: Mastery
+# ═══════════════════════════════════════════════════════════
+
+# Git Analytics
+GIT_STALE_BRANCH_DAYS = 30  # Ветки старше N дней = stale
+
+# Cost Monitor
+COST_LOG_FILE = REPORTS_DIR / "costs.json"
+COST_ALERT_DAILY = 1.0  # $ в день — порог алерта
+
+# Release Manager
+RELEASE_LOG = ROOT / "RELEASES.md"
+
+# Knowledge Distiller
+KNOWLEDGE_DIR = SECOND_BRAIN / "03_Knowledge" / "METAai"
