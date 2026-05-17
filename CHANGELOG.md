@@ -4,6 +4,20 @@
 
 ---
 
+## [2026-05-17] - AI Agent - Phase 7: Growth 📈
+
+### Новые агенты
+- **🔭 Market Scanner** (`market_scanner.py`) — тренды и ниши из TrustMRR
+- **🎯 Idea Scorer** (`idea_scorer.py`) — оценка бизнес-идей по 5 критериям
+- **📈 Revenue Forecaster** (`revenue_forecaster.py`) — прогнозирование MRR
+- **🎯 Opportunity Radar** (`opportunity_radar.py`) — M&A скоринг и red flags
+
+### Улучшения
+- **Conductor v7** — `--phase7`, `--market`, 26 agents total
+- **Config** — TrustMRR cache, IDEA_WEIGHTS, COMPARABLE_MRR_BANDS, M&A thresholds
+
+---
+
 ## [2026-05-17] - AI Agent - Phase 6: Mastery 🧬
 
 ### Новые агенты

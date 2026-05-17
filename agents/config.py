@@ -212,3 +212,38 @@ RELEASE_LOG = ROOT / "RELEASES.md"
 
 # Knowledge Distiller
 KNOWLEDGE_DIR = SECOND_BRAIN / "03_Knowledge" / "METAai"
+
+# ═══════════════════════════════════════════════════════════
+# PHASE 7: Growth
+# ═══════════════════════════════════════════════════════════
+
+# Market Scanner
+TRUSTMRR_CACHE = REPORTS_DIR / "trustmrr_cache.json"
+MARKET_SCAN_FILE = REPORTS_DIR / "market_scan.md"
+GROWTH_THRESHOLD_MOM = 20  # % MoM growth = "interesting"
+MRR_MIN_SIGNAL = 5000  # Только MRR > $5k = реальный сигнал
+
+# Idea Scorer
+IDEA_LOG = SECOND_BRAIN / "06_Business" / "IDEAS_SCORED.md"
+IDEA_WEIGHTS = {
+    "market_size": 0.25,
+    "competition": 0.20,
+    "tech_fit": 0.25,
+    "time_to_mvp": 0.15,
+    "revenue_potential": 0.15,
+}
+
+# Revenue Forecaster
+REVENUE_FORECASTS = REPORTS_DIR / "revenue_forecasts.md"
+COMPARABLE_MRR_BANDS = [
+    (0, 1000, "Pre-Revenue"),
+    (1000, 10000, "Early Traction"),
+    (10000, 50000, "Growth"),
+    (50000, 200000, "Scale"),
+    (200000, float("inf"), "Enterprise"),
+]
+
+# Opportunity Radar
+OPPORTUNITY_FILE = REPORTS_DIR / "opportunities.md"
+MAX_MULTIPLIER_BUY = 12  # Ниже 12× MRR = потенциальная сделка
+MIN_MRR_ACQUISITION = 3000  # Минимальный MRR для рассмотрения

@@ -1,6 +1,6 @@
 """
-🎼 Conductor v6 — Мастер-процесс для всех агентов
-Запускает все 22 агента Phase 1-6, агрегирует результаты.
+🎼 Conductor v7 — Мастер-процесс для всех агентов
+Запускает все 26 агентов Phase 1-7, агрегирует результаты.
 
 Использование:
     python -m agents.conductor                 # Запустить все агенты
@@ -62,8 +62,8 @@ def main():
 
     now = datetime.now()
     print("\n" + "╔" + "═" * 58 + "╗")
-    print("║" + "  🎼 CONDUCTOR v6 — Meta-Engineering Agent Orchestrator".center(58) + "║")
-    print("║" + f"  Phase 1-6 | 22 agents | {now.strftime('%Y-%m-%d %H:%M:%S')}".center(58) + "║")
+    print("║" + "  🎼 CONDUCTOR v7 — Meta-Engineering Agent Orchestrator".center(58) + "║")
+    print("║" + f"  Phase 1-7 | 26 agents | {now.strftime('%Y-%m-%d %H:%M:%S')}".center(58) + "║")
     print("╚" + "═" * 58 + "╝")
 
     extra = []
@@ -78,13 +78,15 @@ def main():
     phase4_only = "--phase4" in args
     phase5_only = "--phase5" in args
     phase6_only = "--phase6" in args
+    phase7_only = "--phase7" in args
     do_digest = "--digest" in args
     do_notify = "--notify" in args
     do_sprint = "--sprint" in args
     do_release = "--release" in args
+    do_market = "--market" in args
     run_all = not any([phase1_only, phase2_only, phase3_only, phase4_only,
-                       phase5_only, phase6_only, do_digest, do_notify,
-                       do_sprint, do_release])
+                       phase5_only, phase6_only, phase7_only, do_digest,
+                       do_notify, do_sprint, do_release, do_market])
     fix_all = "--fix-all" in args
 
     results = {}
@@ -271,6 +273,39 @@ def main():
         if "--save" in args:
             rm_args.append("--save")
         results["release"] = run_agent("release_manager", rm_args)
+
+    # ═══════════════════════════════════════════════════════
+    # PHASE 7: Growth
+    # ═══════════════════════════════════════════════════════
+    if run_all or phase7_only:
+        print("\n" + "█" * 60)
+        print("  📈 PHASE 7 — Growth")
+        print("█" * 60)
+
+        # Agent #23: Market Scanner
+        print_banner("🔭 Agent #23: Market Scanner")
+        ms_args = ["--save"] if "--save" in args else []
+        results["market_scanner"] = run_agent("market_scanner", ms_args)
+
+        # Agent #24: Idea Scorer
+        print_banner("🎯 Agent #24: Idea Scorer")
+        is_args = ["--save"] if "--save" in args else []
+        results["idea_scorer"] = run_agent("idea_scorer", is_args)
+
+        # Agent #25: Revenue Forecaster
+        print_banner("📈 Agent #25: Revenue Forecaster")
+        results["forecaster"] = run_agent("revenue_forecaster", [])
+
+        # Agent #26: Opportunity Radar
+        print_banner("🎯 Agent #26: Opportunity Radar")
+        or_args = ["--save"] if "--save" in args else []
+        results["opportunities"] = run_agent("opportunity_radar", or_args)
+
+    # Standalone: market scan
+    if do_market:
+        print_banner("🔭 Market Scanner")
+        ms_args = ["--save"] if "--save" in args else []
+        results["market_scanner"] = run_agent("market_scanner", ms_args)
 
     # ═══════════════════════════════════════════════════════
     # SUMMARY
