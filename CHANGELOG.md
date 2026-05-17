@@ -4,6 +4,20 @@
 
 ---
 
+## [2026-05-17] - AI Agent - Phase 5: Outreach 📡
+
+### Новые агенты
+- **📲 Telegram Reporter** (`telegram_reporter.py`) — daily summary + critical alerts в Telegram
+- **🗂️ Sprint Planner** (`sprint_planner.py`) — авто-генерация sprint backlog (P0/P1/P2)
+- **⚙️ Self-Tuner** (`self_tuner.py`) — эволюция порогов на основе исторических данных
+- **💰 Portfolio Tracker** (`portfolio_tracker.py`) — бизнес-метрики в BUSINESS_METRICS.md
+
+### Улучшения
+- **Conductor v5** — `--phase5`, `--notify`, `--sprint`, 18 agents total
+- **Config** — TELEGRAM_*, SPRINT_*, BUSINESS_METRICS_FILE
+
+---
+
 ## [2026-05-17] - AI Agent - Phase 4: Intelligence Layer 🧠
 
 ### Новые агенты

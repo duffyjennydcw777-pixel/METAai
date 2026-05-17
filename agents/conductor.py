@@ -1,16 +1,15 @@
 """
-🎼 Conductor v4 — Мастер-процесс для всех агентов
-Запускает все агенты Phase 1 + 2 + 3 + 4, агрегирует результаты.
+🎼 Conductor v5 — Мастер-процесс для всех агентов
+Запускает все агенты Phase 1-5, агрегирует результаты.
 
 Использование:
     python -m agents.conductor                 # Запустить все агенты
     python -m agents.conductor --fix           # Запустить + авто-фикс (Phase 1)
     python -m agents.conductor --save          # Сохранить все отчёты
-    python -m agents.conductor --phase1        # Только Phase 1
-    python -m agents.conductor --phase2        # Только Phase 2
-    python -m agents.conductor --phase3        # Только Phase 3
-    python -m agents.conductor --phase4        # Только Phase 4
+    python -m agents.conductor --phase1-5      # Только конкретная фаза
     python -m agents.conductor --fix-all       # Phase 1+3 fix + Phase 4 auto-commit
+    python -m agents.conductor --notify        # Telegram report
+    python -m agents.conductor --sprint        # Sprint Planner
     python -m agents.conductor --digest        # Weekly Digest
     python -m agents.conductor --kill-all      # Kill switch
 """
@@ -62,8 +61,8 @@ def main():
 
     now = datetime.now()
     print("\n" + "╔" + "═" * 58 + "╗")
-    print("║" + "  🎼 CONDUCTOR v4 — Meta-Engineering Agent Orchestrator".center(58) + "║")
-    print("║" + f"  Phase 1+2+3+4 | {now.strftime('%Y-%m-%d %H:%M:%S')}".center(58) + "║")
+    print("║" + "  🎼 CONDUCTOR v5 — Meta-Engineering Agent Orchestrator".center(58) + "║")
+    print("║" + f"  Phase 1-5 | 18 agents | {now.strftime('%Y-%m-%d %H:%M:%S')}".center(58) + "║")
     print("╚" + "═" * 58 + "╝")
 
     extra = []
@@ -76,8 +75,12 @@ def main():
     phase2_only = "--phase2" in args
     phase3_only = "--phase3" in args
     phase4_only = "--phase4" in args
+    phase5_only = "--phase5" in args
     do_digest = "--digest" in args
-    run_all = not any([phase1_only, phase2_only, phase3_only, phase4_only, do_digest])
+    do_notify = "--notify" in args
+    do_sprint = "--sprint" in args
+    run_all = not any([phase1_only, phase2_only, phase3_only, phase4_only,
+                       phase5_only, do_digest, do_notify, do_sprint])
     fix_all = "--fix-all" in args
 
     results = {}
@@ -192,6 +195,43 @@ def main():
         print_banner("📬 Agent #14: Weekly Digest")
         digest_args = ["--save"] if "--save" in args else []
         results["digest"] = run_agent("weekly_digest", digest_args)
+
+    # ═══════════════════════════════════════════════════════
+    # PHASE 5: Outreach
+    # ═══════════════════════════════════════════════════════
+    if run_all or phase5_only:
+        print("\n" + "█" * 60)
+        print("  📡 PHASE 5 — Outreach")
+        print("█" * 60)
+
+        # Agent #15: Telegram Reporter
+        print_banner("📲 Agent #15: Telegram Reporter")
+        tg_args = ["--dry-run"]
+        results["telegram"] = run_agent("telegram_reporter", tg_args)
+
+        # Agent #16: Sprint Planner
+        print_banner("🗂️ Agent #16: Sprint Planner")
+        sprint_args = ["--save"] if "--save" in args else []
+        results["sprint"] = run_agent("sprint_planner", sprint_args)
+
+        # Agent #17: Self-Tuner
+        print_banner("⚙️ Agent #17: Self-Tuner")
+        results["tuner"] = run_agent("self_tuner", [])
+
+        # Agent #18: Portfolio Tracker
+        print_banner("💰 Agent #18: Portfolio Tracker")
+        port_args = ["--save"] if "--save" in args else []
+        results["portfolio"] = run_agent("portfolio_tracker", port_args)
+
+    # Standalone triggers
+    if do_notify:
+        print_banner("📲 Agent #15: Telegram Reporter")
+        results["telegram"] = run_agent("telegram_reporter", [])
+
+    if do_sprint:
+        print_banner("🗂️ Agent #16: Sprint Planner")
+        sprint_args = ["--save"] if "--save" in args else []
+        results["sprint"] = run_agent("sprint_planner", sprint_args)
 
     # ═══════════════════════════════════════════════════════
     # SUMMARY
