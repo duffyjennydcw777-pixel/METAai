@@ -5,7 +5,7 @@
 - Имя: METAai_NightlyAgents
 - Время: 23:50 каждый день
 - Действие: python -m agents.conductor --save
-- Рабочая папка: c:\Dev\METAai
+- Рабочая папка: c:/Dev/METAai
 
 Использование:
     python agents/setup_scheduler.py          # Создать задачу
@@ -15,7 +15,7 @@
 
 import subprocess
 import sys
-import tempfile
+
 from pathlib import Path
 
 TASK_NAME = "METAai_NightlyAgents"
@@ -92,7 +92,7 @@ def create_task():
             print("Команды:")
             print(f"  Проверить: schtasks /Query /TN {TASK_NAME}")
             print(f"  Запустить: schtasks /Run /TN {TASK_NAME}")
-            print(f"  Удалить:   python agents/setup_scheduler.py --remove")
+            print("  Удалить:   python agents/setup_scheduler.py --remove")
         else:
             print(f"❌ Ошибка: {result.stderr}")
             if "Access" in result.stderr or "доступ" in result.stderr.lower():
