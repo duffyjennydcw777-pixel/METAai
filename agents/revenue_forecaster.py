@@ -74,7 +74,7 @@ def main():
 
     # Parse args: niche, start_mrr, growth
     niche = args[0] if args else "AI SEO"
-    start_mrr = int(args[1]) if len(args) > 1 else 0
+    start_mrr = int(args[1]) if len(args) > 1 else 500  # bootstrap MVP
     growth = float(args[2]) if len(args) > 2 else 20
 
     comps = COMPARABLES.get(niche, [])

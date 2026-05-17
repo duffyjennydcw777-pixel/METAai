@@ -41,13 +41,16 @@ def score_idea(idea_name, niche=None):
     if niche and niche in NICHE_BENCHMARKS:
         bench = NICHE_BENCHMARKS[niche]
     else:
-        # Fuzzy match
+        # Fuzzy match — pick niche with most overlapping words
         idea_lower = idea_name.lower()
+        best_score = 0
         for key, val in NICHE_BENCHMARKS.items():
-            if any(word in idea_lower for word in key.lower().split()):
+            key_words = key.lower().split()
+            overlap = sum(1 for word in key_words if word in idea_lower)
+            if overlap > best_score:
+                best_score = overlap
                 bench = val
                 niche = key
-                break
 
     if not bench:
         bench = {"market_size": 5, "competition": 5, "avg_mrr": 20000, "time_mvp_weeks": 4}
