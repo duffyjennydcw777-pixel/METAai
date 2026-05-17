@@ -247,3 +247,27 @@ COMPARABLE_MRR_BANDS = [
 OPPORTUNITY_FILE = REPORTS_DIR / "opportunities.md"
 MAX_MULTIPLIER_BUY = 12  # Ниже 12× MRR = потенциальная сделка
 MIN_MRR_ACQUISITION = 3000  # Минимальный MRR для рассмотрения
+
+# ═══════════════════════════════════════════════════════════
+# PHASE 8: Intelligence Feeds
+# ═══════════════════════════════════════════════════════════
+
+# TrustMRR Scraper
+TRUSTMRR_URL = "https://trustmrr.com"
+TRUSTMRR_FEED_CACHE = REPORTS_DIR / "feeds" / "trustmrr.json"
+
+# Acquire Scanner
+ACQUIRE_URL = "https://acquire.com"
+ACQUIRE_FEED_CACHE = REPORTS_DIR / "feeds" / "acquire.json"
+
+# ProductHunt Tracker
+PH_URL = "https://www.producthunt.com"
+PH_FEED_CACHE = REPORTS_DIR / "feeds" / "producthunt.json"
+
+# Feed Aggregator
+AGGREGATED_FEED = REPORTS_DIR / "feeds" / "aggregated.md"
+FEED_HISTORY = REPORTS_DIR / "feeds" / "history.json"
+
+# Rate limiting
+SCRAPE_DELAY_SECONDS = 2  # Пауза между запросами
+SCRAPE_USER_AGENT = "METAai-Intelligence/1.0 (market-research)"

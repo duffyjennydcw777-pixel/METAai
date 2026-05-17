@@ -1,6 +1,6 @@
 """
-🎼 Conductor v7 — Мастер-процесс для всех агентов
-Запускает все 26 агентов Phase 1-7, агрегирует результаты.
+🎼 Conductor v8 — Мастер-процесс для всех агентов
+Запускает все 30 агентов Phase 1-8, агрегирует результаты.
 
 Использование:
     python -m agents.conductor                 # Запустить все агенты
@@ -62,8 +62,8 @@ def main():
 
     now = datetime.now()
     print("\n" + "╔" + "═" * 58 + "╗")
-    print("║" + "  🎼 CONDUCTOR v7 — Meta-Engineering Agent Orchestrator".center(58) + "║")
-    print("║" + f"  Phase 1-7 | 26 agents | {now.strftime('%Y-%m-%d %H:%M:%S')}".center(58) + "║")
+    print("║" + "  🎼 CONDUCTOR v8 — Meta-Engineering Agent Orchestrator".center(58) + "║")
+    print("║" + f"  Phase 1-8 | 30 agents | {now.strftime('%Y-%m-%d %H:%M:%S')}".center(58) + "║")
     print("╚" + "═" * 58 + "╝")
 
     extra = []
@@ -79,14 +79,17 @@ def main():
     phase5_only = "--phase5" in args
     phase6_only = "--phase6" in args
     phase7_only = "--phase7" in args
+    phase8_only = "--phase8" in args
     do_digest = "--digest" in args
     do_notify = "--notify" in args
     do_sprint = "--sprint" in args
     do_release = "--release" in args
     do_market = "--market" in args
+    do_feeds = "--feeds" in args
     run_all = not any([phase1_only, phase2_only, phase3_only, phase4_only,
-                       phase5_only, phase6_only, phase7_only, do_digest,
-                       do_notify, do_sprint, do_release, do_market])
+                       phase5_only, phase6_only, phase7_only, phase8_only,
+                       do_digest, do_notify, do_sprint, do_release,
+                       do_market, do_feeds])
     fix_all = "--fix-all" in args
 
     results = {}
@@ -306,6 +309,34 @@ def main():
         print_banner("🔭 Market Scanner")
         ms_args = ["--save"] if "--save" in args else []
         results["market_scanner"] = run_agent("market_scanner", ms_args)
+
+    # ═══════════════════════════════════════════════════════
+    # PHASE 8: Intelligence Feeds
+    # ═══════════════════════════════════════════════════════
+    if run_all or phase8_only or do_feeds:
+        print("\n" + "█" * 60)
+        print("  📡 PHASE 8 — Intelligence Feeds")
+        print("█" * 60)
+
+        # Agent #27: TrustMRR Scraper
+        print_banner("🔭 Agent #27: TrustMRR Scraper")
+        ts_args = ["--save"] if "--save" in args else []
+        results["trustmrr"] = run_agent("trustmrr_scraper", ts_args)
+
+        # Agent #28: Acquire Scanner
+        print_banner("🏪 Agent #28: Acquire Scanner")
+        as_args = ["--save"] if "--save" in args else []
+        results["acquire"] = run_agent("acquire_scanner", as_args)
+
+        # Agent #29: ProductHunt Tracker
+        print_banner("🚀 Agent #29: ProductHunt Tracker")
+        ph_args = ["--save"] if "--save" in args else []
+        results["producthunt"] = run_agent("ph_tracker", ph_args)
+
+        # Agent #30: Feed Aggregator
+        print_banner("📡 Agent #30: Feed Aggregator")
+        fa_args = ["--save"] if "--save" in args else []
+        results["aggregator"] = run_agent("feed_aggregator", fa_args)
 
     # ═══════════════════════════════════════════════════════
     # SUMMARY

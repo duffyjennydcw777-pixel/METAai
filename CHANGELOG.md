@@ -4,6 +4,20 @@
 
 ---
 
+## [2026-05-17] - AI Agent - Phase 8: Intelligence Feeds 📡
+
+### Новые агенты
+- **🔭 TrustMRR Scraper** (`trustmrr_scraper.py`) — живой парсинг стартап-листингов
+- **🏪 Acquire Scanner** (`acquire_scanner.py`) — M&A лоты с Acquire.com
+- **🚀 ProductHunt Tracker** (`ph_tracker.py`) — тренды и голоса
+- **📡 Feed Aggregator** (`feed_aggregator.py`) — объединяет все фиды
+
+### Улучшения
+- **Conductor v8** — `--phase8`, `--feeds`, 30 agents total
+- **Config** — URLs, feed caches, rate limiting, user agent
+
+---
+
 ## [2026-05-17] - AI Agent - Phase 7: Growth 📈
 
 ### Новые агенты
