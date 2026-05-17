@@ -8,6 +8,7 @@
 """
 
 import json
+import os
 import subprocess
 import sys
 import time
@@ -31,26 +32,39 @@ BENCHMARK_AGENTS = [
 ]
 
 
+# Надёжный корень проекта (resolve для nested subprocess)
+PROJECT_ROOT = str(Path(__file__).resolve().parent.parent)
+
+
 def benchmark_agent(module_name, extra_args=""):
     """Запускает агента и замеряет время."""
     cmd = [sys.executable, "-m", f"agents.{module_name}"]
     if extra_args:
         cmd.append(extra_args)
 
+    env = dict(os.environ)
+    env["PYTHONPATH"] = PROJECT_ROOT
+    env["PYTHONUTF8"] = "1"
+    env["PYTHONIOENCODING"] = "utf-8"
+
     start = time.time()
     try:
         result = subprocess.run(
             cmd, capture_output=True, text=True, timeout=60,
-            cwd=str(Path(__file__).parent.parent),
+            cwd=PROJECT_ROOT, env=env, encoding="utf-8", errors="replace"
         )
         elapsed = round(time.time() - start, 3)
+        stderr_snippet = ""
+        if result.returncode != 0 and result.stderr:
+            stderr_snippet = result.stderr.strip().splitlines()[-1][:80]
         return {
             "agent": module_name,
             "time_sec": elapsed,
             "exit_code": result.returncode,
             "ok": result.returncode == 0,
-            "stdout_lines": len(result.stdout.splitlines()),
-            "stderr_lines": len(result.stderr.splitlines()),
+            "stdout_lines": len(result.stdout.splitlines()) if result.stdout else 0,
+            "stderr_lines": len(result.stderr.splitlines()) if result.stderr else 0,
+            "error": stderr_snippet if stderr_snippet else None,
         }
     except subprocess.TimeoutExpired:
         return {
@@ -123,7 +137,8 @@ def main():
         results.append(bench)
 
         icon = "✅" if bench["ok"] else "❌"
-        print(f"{icon} {bench['time_sec']:.3f}s")
+        error_hint = f" ({bench['error'][:40]})" if bench.get("error") else ""
+        print(f"{icon} {bench['time_sec']:.3f}s{error_hint}")
 
     # Summary
     ok_count = sum(1 for r in results if r["ok"])
