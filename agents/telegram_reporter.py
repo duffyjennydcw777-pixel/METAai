@@ -25,6 +25,12 @@ from agents.config import (
 
 
 def get_telegram_creds():
+    # Load .env if dotenv available
+    try:
+        from dotenv import load_dotenv
+        load_dotenv(Path(__file__).parent.parent / ".env")
+    except ImportError:
+        pass
     token = os.environ.get(TELEGRAM_BOT_TOKEN_ENV, "")
     chat_id = os.environ.get(TELEGRAM_CHAT_ID_ENV, "")
     return token, chat_id
