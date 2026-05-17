@@ -1,6 +1,6 @@
 """
 METAai Agents — Конфигурация
-Единый источник правды для всех агентов (Phase 1 + Phase 2).
+Единый источник правды для всех агентов (Phase 1 + Phase 2 + Phase 3).
 """
 from pathlib import Path
 from datetime import timedelta
@@ -87,17 +87,64 @@ STALENESS_THRESHOLDS = {
 DEFAULT_STALENESS = timedelta(days=30)
 
 # ═══════════════════════════════════════════════════════════
-# ПРАВИЛА СИНХРОНИЗАЦИИ RULES
+# ПРАВИЛА СИНХРОНИЗАЦИИ RULES (Phase 3: Rule Syncer)
 # ═══════════════════════════════════════════════════════════
 
-# Эталонные файлы (мастер-копии)
+# Источник мастер-копий — METAai
+MASTER_RULES_SOURCE = DEV_ROOT / "METAai" / ".agent" / "rules"
+
+# Глобальные rules — синхронизируются во ВСЕ проекты
+GLOBAL_RULES = [
+    "GLOBAL.md",
+    "MODES.md",
+    "MAKER_PROFILE.md",
+    "CONVENTIONS.md",
+    "CODE_COMPLEXITY.md",
+    "habits.md",
+    "playbooks.md",
+    "roi_filter.md",
+    "ai_workflow.md",
+]
+
+# Старый формат для обратной совместимости (Compliance Checker)
 MASTER_RULES = {
-    "playbooks.md":         DEV_ROOT / "FreshCut" / ".agent" / "rules" / "playbooks.md",
-    "habits.md":            DEV_ROOT / "FreshCut" / ".agent" / "rules" / "habits.md",
-    "CODE_COMPLEXITY.md":   DEV_ROOT / "ONYX" / ".agent" / "rules" / "CODE_COMPLEXITY.md",
-    "roi_filter.md":        DEV_ROOT / "FreshCut" / ".agent" / "rules" / "roi_filter.md",
-    "ai_workflow.md":       DEV_ROOT / "FreshCut" / ".agent" / "rules" / "ai_workflow.md",
+    rule: MASTER_RULES_SOURCE / rule
+    for rule in GLOBAL_RULES
+    if (MASTER_RULES_SOURCE / rule).exists()
 }
+
+# Файлы, которые Rule Syncer НЕ трогает (уникальны для каждого проекта)
+PROJECT_SPECIFIC_RULES = [
+    "PROJECT.md",
+    "ODAF.md",
+    "freshcut.md",
+    "onyx.md",
+    "sylectus.md",
+    "amazonbot.md",
+]
+
+# ═══════════════════════════════════════════════════════════
+# TODO HARVESTER (Phase 3)
+# ═══════════════════════════════════════════════════════════
+
+# Паттерны для поиска техдолга
+TODO_PATTERNS = ["TODO", "FIXME", "HACK", "XXX"]
+
+# Приоритет (чем выше индекс, тем критичнее)
+TODO_PRIORITY = {"XXX": 0, "TODO": 1, "HACK": 2, "FIXME": 3}
+
+# Файлы/папки исключённые из поиска TODO
+TODO_EXCLUDE_DIRS = [
+    ".git", ".venv", "venv", "node_modules", "__pycache__",
+    ".agent", "reports", "dist", "build", ".shared",
+]
+
+TODO_EXCLUDE_EXTENSIONS = [
+    ".pyc", ".pyo", ".exe", ".dll", ".so", ".whl",
+    ".zip", ".tar", ".gz", ".pdf", ".docx", ".xlsx",
+    ".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp",
+    ".lock", ".map",
+]
 
 # ═══════════════════════════════════════════════════════════
 # ОТЧЁТЫ

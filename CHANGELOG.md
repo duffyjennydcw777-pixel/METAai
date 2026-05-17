@@ -4,7 +4,41 @@
 
 ---
 
+## [2026-05-17] - AI Agent - Phase 3: Automation Agents ⚡
+
+### Новые агенты
+- **🔄 Rule Syncer** (`rule_syncer.py`) — синхронизация rules
+  - Сравнивает MD5 глобальных rules (9 файлов) с METAai мастером
+  - `--fix` автокопирование, защита project-specific файлов (PROJECT.md, freshcut.md)
+  - Drift detection по всем 5 проектам
+- **📌 TODO Harvester** (`todo_harvester.py`) — сбор техдолга
+  - Рекурсивный grep TODO/FIXME/HACK/XXX по всем проектам
+  - False positive фильтр (translations, docstrings)
+  - Тренд-трекинг (больше/меньше маркеров)
+  - `--obsidian` обновляет TODO_BACKLOG.md в Second Brain
+- **🔒 Lock Generator** (`lock_generator.py`) — lock-файлы
+  - Python: `pip freeze` из venv → `requirements.lock`
+  - Node: `npm install --package-lock-only`
+  - Стек-детекция, pinning анализ
+- **📊 Obsidian Pulse** (`obsidian_pulse.py`) — auto-update Second Brain
+  - Парсит health reports → обновляет Main_Dashboard.md
+  - Добавляет записи в EVOLUTION_LOG.md
+  - Git-статистика по всем проектам
+
+### Улучшения
+- **Conductor v3** — `--phase3`, `--fix-all` (auto-fix Rule Syncer + Lock Generator)
+- **Config** — `GLOBAL_RULES` (9 файлов), `MASTER_RULES_SOURCE`, `TODO_*` конфиг
+  - Мастер-копии теперь берутся из METAai (было: FreshCut/ONYX разнобой)
+  - `PROJECT_SPECIFIC_RULES` — защита от перезаписи уникальных rules
+
+### FreshCut Greens
+- Синхронизированы 6 rules: GLOBAL, MODES, MAKER_PROFILE, CONVENTIONS, PROJECT
+- Создан DECISIONS.md (7 решений: DEC-001..DEC-007)
+
+---
+
 ## [2026-05-17] - AI Agent - Phase 2: Deep Analysis Agents 📊
+
 
 ### Новые агенты
 - **🏥 Health Monitor** (`health_monitor.py`) — полный анализ здоровья проектов
