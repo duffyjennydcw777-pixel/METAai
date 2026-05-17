@@ -151,3 +151,31 @@ TODO_EXCLUDE_EXTENSIONS = [
 # ═══════════════════════════════════════════════════════════
 
 REPORTS_DIR = DEV_ROOT / "METAai" / "agents" / "reports"
+
+# ═══════════════════════════════════════════════════════════
+# PHASE 4: Intelligence Layer
+# ═══════════════════════════════════════════════════════════
+
+# Drift Predictor: история health scores
+HISTORY_FILE = REPORTS_DIR / "history.json"
+
+# Auto-Committer: whitelist файлов, разрешённых для авто-коммита
+AUTO_COMMIT_WHITELIST = [
+    ".agent/rules/*.md",
+    "requirements.lock",
+    "package-lock.json",
+    "CHANGELOG.md",
+    "DECISIONS.md",
+    "EXPERIMENTS.md",
+    "REFLEXION_LOG.md",
+    "SOLUTION_PATTERNS.md",
+]
+
+# Weekly Digest: куда сохранять
+DIGEST_DIR = SECOND_BRAIN / "01_Dashboard"
+
+# Correlator: пороги
+CORRELATION_MIN_PROJECTS = 2  # Мин. проектов для "системной" проблемы
+HEALTH_CRITICAL_THRESHOLD = 70  # Ниже — критично
+HEALTH_WARNING_THRESHOLD = 85  # Ниже — предупреждение
+TREND_ALERT_DAYS = 3  # Дней подряд снижения для алерта

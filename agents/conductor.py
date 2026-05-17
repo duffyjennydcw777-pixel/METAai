@@ -1,6 +1,6 @@
 """
-🎼 Conductor v3 — Мастер-процесс для всех агентов
-Запускает все агенты Phase 1 + Phase 2 + Phase 3, агрегирует результаты.
+🎼 Conductor v4 — Мастер-процесс для всех агентов
+Запускает все агенты Phase 1 + 2 + 3 + 4, агрегирует результаты.
 
 Использование:
     python -m agents.conductor                 # Запустить все агенты
@@ -9,7 +9,9 @@
     python -m agents.conductor --phase1        # Только Phase 1
     python -m agents.conductor --phase2        # Только Phase 2
     python -m agents.conductor --phase3        # Только Phase 3
-    python -m agents.conductor --fix-all       # Phase 1 --fix + Phase 3 auto-fix
+    python -m agents.conductor --phase4        # Только Phase 4
+    python -m agents.conductor --fix-all       # Phase 1+3 fix + Phase 4 auto-commit
+    python -m agents.conductor --digest        # Weekly Digest
     python -m agents.conductor --kill-all      # Kill switch
 """
 
@@ -60,8 +62,8 @@ def main():
 
     now = datetime.now()
     print("\n" + "╔" + "═" * 58 + "╗")
-    print("║" + "  🎼 CONDUCTOR v3 — Meta-Engineering Agent Orchestrator".center(58) + "║")
-    print("║" + f"  Phase 1 + 2 + 3 | {now.strftime('%Y-%m-%d %H:%M:%S')}".center(58) + "║")
+    print("║" + "  🎼 CONDUCTOR v4 — Meta-Engineering Agent Orchestrator".center(58) + "║")
+    print("║" + f"  Phase 1+2+3+4 | {now.strftime('%Y-%m-%d %H:%M:%S')}".center(58) + "║")
     print("╚" + "═" * 58 + "╝")
 
     extra = []
@@ -73,7 +75,9 @@ def main():
     phase1_only = "--phase1" in args
     phase2_only = "--phase2" in args
     phase3_only = "--phase3" in args
-    run_all = not phase1_only and not phase2_only and not phase3_only
+    phase4_only = "--phase4" in args
+    do_digest = "--digest" in args
+    run_all = not any([phase1_only, phase2_only, phase3_only, phase4_only, do_digest])
     fix_all = "--fix-all" in args
 
     results = {}
@@ -156,6 +160,38 @@ def main():
         print_banner("📊 Agent #10: Obsidian Pulse")
         pulse_args = ["--save"] if "--save" in args else []
         results["pulse"] = run_agent("obsidian_pulse", pulse_args)
+
+    # ═══════════════════════════════════════════════════════
+    # PHASE 4: Intelligence
+    # ═══════════════════════════════════════════════════════
+    if run_all or phase4_only:
+        print("\n" + "█" * 60)
+        print("  🧠 PHASE 4 — Intelligence")
+        print("█" * 60)
+
+        # Agent #11: Correlator
+        print_banner("🔗 Agent #11: Cross-Project Correlator")
+        corr_args = ["--save"] if "--save" in args else []
+        results["correlator"] = run_agent("correlator", corr_args)
+
+        # Agent #12: Drift Predictor
+        print_banner("📈 Agent #12: Drift Predictor")
+        drift_args = ["--save"] if "--save" in args else []
+        results["drift"] = run_agent("drift_predictor", drift_args)
+
+        # Agent #13: Auto-Committer (после fix-all)
+        if fix_all:
+            print_banner("🤖 Agent #13: Auto-Committer")
+            commit_args = ["--commit"]
+            if "--push" in args:
+                commit_args.append("--push")
+            results["auto_commit"] = run_agent("auto_committer", commit_args)
+
+    # Weekly Digest (по запросу)
+    if do_digest or (run_all and "--save" in args):
+        print_banner("📬 Agent #14: Weekly Digest")
+        digest_args = ["--save"] if "--save" in args else []
+        results["digest"] = run_agent("weekly_digest", digest_args)
 
     # ═══════════════════════════════════════════════════════
     # SUMMARY

@@ -4,6 +4,35 @@
 
 ---
 
+## [2026-05-17] - AI Agent - Phase 4: Intelligence Layer 🧠
+
+### Новые агенты
+- **🔗 Correlator** (`correlator.py`) — кросс-проектный анализ
+  - Парсит все отчёты Phase 1-3, строит корреляционную матрицу
+  - Определяет системные vs точечные проблемы
+  - Рекомендации на основе паттернов
+- **📈 Drift Predictor** (`drift_predictor.py`) — предсказание деградации
+  - Хранит историю health scores в `history.json`
+  - Velocity (%/day), consecutive decline detection
+  - Прогноз: "через N дней health упадёт ниже порога"
+- **🤖 Auto-Committer** (`auto_committer.py`) — авто-коммит
+  - Whitelist-based: только `.agent/rules/`, lock-файлы, docs
+  - Dry-run по умолчанию, `--commit` для реального коммита
+  - Try commit → fallback `--no-verify`
+- **📬 Weekly Digest** (`weekly_digest.py`) — еженедельное суммари
+  - KPI: commits, health delta, TODOs, active projects
+  - Достижения + Action Items
+  - Сохраняет в Obsidian `01_Dashboard/Weekly_Digest_*.md`
+
+### Улучшения
+- **Conductor v4** — `--phase4`, `--digest`, `--auto-commit`
+- **Config** — `HISTORY_FILE`, `AUTO_COMMIT_WHITELIST`, `DIGEST_DIR`, thresholds
+
+### Fixes
+- pytest cp1251 UnicodeDecodeError — force UTF-8 в subprocess calls
+
+---
+
 ## [2026-05-17] - AI Agent - Phase 3: Automation Agents ⚡
 
 ### Новые агенты
