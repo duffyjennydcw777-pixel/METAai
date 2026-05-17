@@ -31,11 +31,11 @@ PROJECTS_PLANNING = {
 # ═══════════════════════════════════════════════════════════
 
 REQUIRED_RULES = [
-    "playbooks.md",       # Навигация по стратегическим инструментам
-    "habits.md",          # Энергетические паттерны создателя
-    "code_complexity.md", # 3-уровневый QA
-    "roi_filter.md",      # Фильтр решений через ROI
-    "ai_workflow.md",     # Pre-Mortem, 3 сценария, Action Gate
+    "playbooks.md",         # Навигация по стратегическим инструментам
+    "habits.md",            # Энергетические паттерны создателя
+    "CODE_COMPLEXITY.md",   # 3-уровневый QA (uppercase в проектах)
+    "roi_filter.md",        # Фильтр решений через ROI
+    "ai_workflow.md",       # Pre-Mortem, 3 сценария, Action Gate
 ]
 
 # Опциональные (рекомендуемые) rules
@@ -92,11 +92,11 @@ DEFAULT_STALENESS = timedelta(days=30)
 
 # Эталонные файлы (мастер-копии)
 MASTER_RULES = {
-    "playbooks.md":       DEV_ROOT / "FreshCut" / ".agent" / "rules" / "playbooks.md",
-    "habits.md":          DEV_ROOT / "FreshCut" / ".agent" / "rules" / "habits.md",
-    "code_complexity.md": DEV_ROOT / "ONYX" / ".agent" / "rules" / "code_complexity.md",
-    "roi_filter.md":      DEV_ROOT / "FreshCut" / ".agent" / "rules" / "roi_filter.md",
-    "ai_workflow.md":     DEV_ROOT / "FreshCut" / ".agent" / "rules" / "ai_workflow.md",
+    "playbooks.md":         DEV_ROOT / "FreshCut" / ".agent" / "rules" / "playbooks.md",
+    "habits.md":            DEV_ROOT / "FreshCut" / ".agent" / "rules" / "habits.md",
+    "CODE_COMPLEXITY.md":   DEV_ROOT / "ONYX" / ".agent" / "rules" / "CODE_COMPLEXITY.md",
+    "roi_filter.md":        DEV_ROOT / "FreshCut" / ".agent" / "rules" / "roi_filter.md",
+    "ai_workflow.md":       DEV_ROOT / "FreshCut" / ".agent" / "rules" / "ai_workflow.md",
 }
 
 # ═══════════════════════════════════════════════════════════
