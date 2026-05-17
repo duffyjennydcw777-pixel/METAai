@@ -271,3 +271,100 @@ FEED_HISTORY = REPORTS_DIR / "feeds" / "history.json"
 # Rate limiting
 SCRAPE_DELAY_SECONDS = 2  # Пауза между запросами
 SCRAPE_USER_AGENT = "METAai-Intelligence/1.0 (market-research)"
+
+# ═══════════════════════════════════════════════════════════
+# PHASE 9: Autonomous Loop
+# ═══════════════════════════════════════════════════════════
+
+# Signal Router
+SIGNAL_LOG = REPORTS_DIR / "signals" / "routed.json"
+SIGNAL_RULES = {
+    "cheap_deal": {"threshold_mult": 6, "route_to": "deal_evaluator"},
+    "hot_trend": {"threshold_votes": 100, "route_to": "trend_matcher"},
+    "high_mrr": {"threshold_mrr": 50000, "route_to": "idea_scorer"},
+}
+
+# Deal Evaluator
+DEAL_EVALUATIONS = REPORTS_DIR / "signals" / "deal_evaluations.json"
+DEAL_MIN_MRR = 5000           # Минимальный MRR для deep-dive
+DEAL_MAX_MULTIPLIER = 8       # Только сделки ≤ 8× MRR
+DEAL_TOP_N = 10               # Топ-N сделок для оценки
+
+# Trend Matcher
+TREND_MATCHES = REPORTS_DIR / "signals" / "trend_matches.json"
+TREND_MIN_OVERLAP = 2         # Мин. пересечение слов для матча
+
+# Action Generator
+ACTION_QUEUE = REPORTS_DIR / "signals" / "actions.json"
+ACTION_LOG = REPORTS_DIR / "signals" / "action_history.json"
+MAX_ACTIONS_PER_RUN = 5       # Не больше 5 задач за цикл
+
+# ═══════════════════════════════════════════════════════════
+# PHASE 10: Competitor Intelligence
+# ═══════════════════════════════════════════════════════════
+
+# Competitor Tracker
+COMPETITOR_CACHE = REPORTS_DIR / "competitors" / "tracker.json"
+COMPETITORS = {
+    "ONYX": [
+        {"name": "Outline VPN", "url": "https://getoutline.org"},
+        {"name": "Amnezia VPN", "url": "https://amnezia.org"},
+        {"name": "Windscribe", "url": "https://windscribe.com"},
+    ],
+    "Sylectus": [
+        {"name": "LoadSmart", "url": "https://loadsmart.com"},
+        {"name": "Convoy", "url": "https://convoy.com"},
+    ],
+}
+
+# Feature Radar
+FEATURE_CACHE = REPORTS_DIR / "competitors" / "features.json"
+
+# Pricing Monitor
+PRICING_CACHE = REPORTS_DIR / "competitors" / "pricing.json"
+
+
+# ═══════════════════════════════════════════════════════════
+# Phase 12: Meta-Evolution
+# ═══════════════════════════════════════════════════════════
+EVOLUTION_DIR = REPORTS_DIR / "evolution"
+
+# Knowledge Distiller — агрегирует insights из всех отчётов
+KNOWLEDGE_CACHE = EVOLUTION_DIR / "knowledge.json"
+KNOWLEDGE_MAX_INSIGHTS = 50
+
+# Portfolio Tracker — отслеживает все наши проекты
+PORTFOLIO_CACHE = EVOLUTION_DIR / "portfolio.json"
+PORTFOLIO = {
+    "ONYX": {
+        "type": "VPN SaaS",
+        "stage": "growth",
+        "mrr": 0,  # Обновляется из реальных данных
+        "url": "https://t.me/onyx_vpn_bot",
+    },
+    "Sylectus": {
+        "type": "Logistics TMS",
+        "stage": "mvp",
+        "mrr": 0,
+        "url": "",
+    },
+    "FreshCut Greens": {
+        "type": "Microgreens Farm",
+        "stage": "pre-launch",
+        "mrr": 0,
+        "url": "",
+    },
+}
+
+# Self-Tuner — самокоррекция параметров
+TUNER_CACHE = EVOLUTION_DIR / "tuner.json"
+TUNER_METRICS = {
+    "signal_noise_ratio": 0.0,   # Сигналы / общее кол-во данных
+    "action_completion_rate": 0.0,  # Выполненные задачи / сгенерированные
+    "deal_accuracy": 0.0,        # BUY/WATCH точность (manual feedback)
+    "scrape_success_rate": 0.0,  # Успешные скрейпы / попытки
+}
+
+# Performance Benchmarker
+BENCHMARK_CACHE = EVOLUTION_DIR / "benchmarks.json"
+BENCHMARK_HISTORY_LIMIT = 30  # Хранить N последних запусков

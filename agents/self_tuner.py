@@ -1,185 +1,253 @@
 """
-⚙️ Agent #17: Self-Tuner
-Анализирует историю и предлагает обновление порогов.
+🔧 Agent #41: Self-Tuner
+Анализирует эффективность системы и корректирует параметры.
+Замеряет: signal-to-noise ratio, scrape success rate, action completion.
 
-    python -m agents.self_tuner               # Dry-run (показать)
-    python -m agents.self_tuner --apply       # Записать в config
-    python -m agents.self_tuner --save        # + отчёт
+    python -m agents.self_tuner                    # Анализ
+    python -m agents.self_tuner --save             # + сохранить
 """
 
 import json
-import statistics
 import sys
 from datetime import datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from agents.config import (
-    REPORTS_DIR, HISTORY_FILE,
-    HEALTH_CRITICAL_THRESHOLD, HEALTH_WARNING_THRESHOLD,
-    TREND_ALERT_DAYS,
+    TUNER_CACHE, REPORTS_DIR, EVOLUTION_DIR,
 )
 
-CONFIG_FILE = Path(__file__).parent / "config.py"
+
+def load_json(path):
+    if path.exists():
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            pass
+    return {}
 
 
-def load_history():
-    if not HISTORY_FILE.exists():
-        return {}
-    try:
-        return json.loads(HISTORY_FILE.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
-        return {}
+def measure_signal_noise():
+    """Измеряет signal-to-noise ratio."""
+    signals_path = REPORTS_DIR / "signals" / "routed.json"
+    data = load_json(signals_path)
+    signals = data.get("signals", [])
 
-
-def analyze_thresholds(history):
-    """Анализирует историю и предлагает новые пороги."""
-    if len(history) < 3:
-        return None, "Недостаточно данных (нужно 3+ снимков)"
-
-    # Собираем все scores
-    all_scores = []
-    for day_data in history.values():
-        all_scores.extend(day_data.values())
-
-    if not all_scores:
-        return None, "Нет данных"
-
-    avg = statistics.mean(all_scores)
-    stdev = statistics.stdev(all_scores) if len(all_scores) > 1 else 0
-    median = statistics.median(all_scores)
-
-    proposals = []
-
-    # Health Warning Threshold
-    new_warning = round(avg - stdev)
-    new_warning = max(75, min(95, new_warning))  # Clamp
-    if abs(new_warning - HEALTH_WARNING_THRESHOLD) >= 3:
-        proposals.append({
-            "param": "HEALTH_WARNING_THRESHOLD",
-            "current": HEALTH_WARNING_THRESHOLD,
-            "proposed": new_warning,
-            "reason": f"avg={avg:.0f}%, stdev={stdev:.1f}%,"
-                      f" предлагаемый порог = avg - stdev",
-        })
-
-    # Health Critical Threshold
-    new_critical = round(avg - 2 * stdev)
-    new_critical = max(50, min(80, new_critical))
-    if abs(new_critical - HEALTH_CRITICAL_THRESHOLD) >= 5:
-        proposals.append({
-            "param": "HEALTH_CRITICAL_THRESHOLD",
-            "current": HEALTH_CRITICAL_THRESHOLD,
-            "proposed": new_critical,
-            "reason": f"avg={avg:.0f}%, предлагаемый = avg - 2×stdev",
-        })
-
-    # Trend Alert Days
-    # Если все тренды короткие, уменьшить порог
-    dates = sorted(history.keys())
-    max_decline = 0
-    for project in set().union(*[d.keys() for d in history.values()]):
-        current_decline = 0
-        for i in range(1, len(dates)):
-            prev = history[dates[i - 1]].get(project, 0)
-            curr = history[dates[i]].get(project, 0)
-            if curr < prev:
-                current_decline += 1
-            else:
-                max_decline = max(max_decline, current_decline)
-                current_decline = 0
-        max_decline = max(max_decline, current_decline)
-
-    if max_decline > 0 and max_decline < TREND_ALERT_DAYS:
-        proposals.append({
-            "param": "TREND_ALERT_DAYS",
-            "current": TREND_ALERT_DAYS,
-            "proposed": max(1, max_decline),
-            "reason": f"макс. зафиксированное снижение = {max_decline}д,"
-                      " текущий порог не срабатывает",
-        })
-
-    stats_info = {
-        "avg": round(avg, 1),
-        "median": round(median, 1),
-        "stdev": round(stdev, 1),
-        "min": min(all_scores),
-        "max": max(all_scores),
-        "samples": len(all_scores),
-        "days": len(history),
+    # Общее кол-во входных данных
+    feeds = {
+        "trustmrr": REPORTS_DIR / "feeds" / "trustmrr.json",
+        "acquire": REPORTS_DIR / "feeds" / "acquire.json",
+        "producthunt": REPORTS_DIR / "feeds" / "producthunt.json",
     }
 
-    return proposals, stats_info
+    total_items = 0
+    for feed_path in feeds.values():
+        fd = load_json(feed_path)
+        items = fd.get("listings", fd.get("products", []))
+        total_items += len(items)
+
+    ratio = len(signals) / total_items if total_items > 0 else 0
+    return {
+        "total_feed_items": total_items,
+        "signals_routed": len(signals),
+        "ratio": round(ratio, 3),
+        "quality": "good" if ratio > 0.05 else "low" if ratio < 0.01 else "ok",
+    }
 
 
-def apply_proposals(proposals):
-    """Записывает предложенные пороги в config.py."""
-    content = CONFIG_FILE.read_text(encoding="utf-8")
-    for p in proposals:
-        old = f"{p['param']} = {p['current']}"
-        new = f"{p['param']} = {p['proposed']}"
-        content = content.replace(old, new)
-    CONFIG_FILE.write_text(content, encoding="utf-8")
+def measure_action_completion():
+    """Измеряет сколько задач выполнено vs сгенерировано."""
+    actions_path = REPORTS_DIR / "signals" / "actions.json"
+    data = load_json(actions_path)
+    actions = data.get("actions", [])
+
+    total = len(actions)
+    completed = len([a for a in actions if a.get("status") == "done"])
+    pending = len([a for a in actions if a.get("status") == "pending"])
+
+    rate = completed / total if total > 0 else 0
+    return {
+        "total_actions": total,
+        "completed": completed,
+        "pending": pending,
+        "completion_rate": round(rate, 3),
+        "quality": "good" if rate > 0.5 else "starting" if total < 5 else "behind",
+    }
+
+
+def measure_scrape_success():
+    """Измеряет успешность скрейпинга."""
+    feeds = {
+        "trustmrr": REPORTS_DIR / "feeds" / "trustmrr.json",
+        "acquire": REPORTS_DIR / "feeds" / "acquire.json",
+        "producthunt": REPORTS_DIR / "feeds" / "producthunt.json",
+    }
+
+    results = {}
+    success = 0
+    total = 0
+
+    for name, path in feeds.items():
+        total += 1
+        data = load_json(path)
+        items = data.get("listings", data.get("products", []))
+        ok = len(items) > 0
+        if ok:
+            success += 1
+        results[name] = {
+            "items": len(items),
+            "ok": ok,
+            "scraped_at": data.get("scraped_at", "never"),
+        }
+
+    rate = success / total if total > 0 else 0
+    return {
+        "feeds": results,
+        "success_rate": round(rate, 3),
+        "quality": "good" if rate >= 0.8 else "degraded",
+    }
+
+
+def measure_deal_accuracy():
+    """Измеряет точность оценки сделок."""
+    deals_path = REPORTS_DIR / "signals" / "deal_evaluations.json"
+    data = load_json(deals_path)
+    evaluations = data.get("evaluations", [])
+
+    buy_count = len([e for e in evaluations if "BUY" in e.get("verdict", "")])
+    watch_count = len([e for e in evaluations if "WATCH" in e.get("verdict", "")])
+    skip_count = len([e for e in evaluations if "SKIP" in e.get("verdict", "")])
+
+    return {
+        "total_evaluated": len(evaluations),
+        "buy": buy_count,
+        "watch": watch_count,
+        "skip": skip_count,
+        "selectivity": round(buy_count / len(evaluations), 3) if evaluations else 0,
+    }
+
+
+def generate_recommendations(metrics):
+    """Генерирует рекомендации по самонастройке."""
+    recs = []
+
+    snr = metrics["signal_noise"]
+    if snr["quality"] == "low":
+        recs.append({
+            "area": "signal_routing",
+            "action": "Ослабить пороги сигналов — слишком мало проходит",
+            "severity": "medium",
+        })
+    elif snr["ratio"] > 0.3:
+        recs.append({
+            "area": "signal_routing",
+            "action": "Ужесточить пороги — слишком много шума",
+            "severity": "medium",
+        })
+
+    scrape = metrics["scrape_success"]
+    if scrape["quality"] == "degraded":
+        recs.append({
+            "area": "scrapers",
+            "action": "Проверить скрейперы — часть фидов пуста",
+            "severity": "high",
+        })
+
+    actions = metrics["action_completion"]
+    if actions["quality"] == "behind":
+        recs.append({
+            "area": "execution",
+            "action": "Бэклог растёт — нужно приоритизировать задачи",
+            "severity": "high",
+        })
+
+    deals = metrics["deal_accuracy"]
+    if deals["selectivity"] == 0 and deals["total_evaluated"] > 0:
+        recs.append({
+            "area": "deal_evaluation",
+            "action": "Нет BUY сделок — проверить пороги или качество данных",
+            "severity": "low",
+        })
+
+    return recs
 
 
 def main():
     args = sys.argv[1:]
-    do_apply = "--apply" in args
-    save_md = "--save" in args or "--md" in args
-
-    history = load_history()
-    proposals, info = analyze_thresholds(history)
+    save_md = "--save" in args
 
     print("\n" + "=" * 60)
-    print("  ⚙️ SELF-TUNER — Phase 5 Agent #17")
+    print("  🔧 SELF-TUNER — Phase 12 Agent #41")
     print("=" * 60)
 
-    if isinstance(info, str):
-        print(f"  ⚠️ {info}")
-        print("=" * 60 + "\n")
-        return
+    # Collect metrics
+    metrics = {
+        "signal_noise": measure_signal_noise(),
+        "action_completion": measure_action_completion(),
+        "scrape_success": measure_scrape_success(),
+        "deal_accuracy": measure_deal_accuracy(),
+    }
 
-    print(f"  📊 Stats: avg={info['avg']}%, median={info['median']}%,"
-          f" stdev={info['stdev']}%")
-    print(f"  📏 Range: {info['min']}% — {info['max']}%"
-          f" ({info['samples']} samples, {info['days']} days)")
-    print()
+    # Display
+    snr = metrics["signal_noise"]
+    print("\n  📡 Signal-to-Noise Ratio:")
+    print(f"    Feed items: {snr['total_feed_items']} → Signals: {snr['signals_routed']} "
+          f"(ratio: {snr['ratio']}) [{snr['quality']}]")
 
-    if not proposals:
-        print("  ✅ Все пороги оптимальны, изменений не требуется")
+    scrape = metrics["scrape_success"]
+    print(f"\n  🌐 Scrape Success Rate: {scrape['success_rate']*100:.0f}% [{scrape['quality']}]")
+    for name, info in scrape["feeds"].items():
+        icon = "✅" if info["ok"] else "❌"
+        print(f"    {icon} {name}: {info['items']} items")
+
+    actions = metrics["action_completion"]
+    print("\n  ⚡ Action Completion:")
+    print(f"    Total: {actions['total_actions']} | Done: {actions['completed']} | "
+          f"Pending: {actions['pending']} ({actions['completion_rate']*100:.0f}%) "
+          f"[{actions['quality']}]")
+
+    deals = metrics["deal_accuracy"]
+    print("\n  💰 Deal Accuracy:")
+    print(f"    Evaluated: {deals['total_evaluated']} | "
+          f"BUY: {deals['buy']} | WATCH: {deals['watch']} | SKIP: {deals['skip']} "
+          f"(selectivity: {deals['selectivity']*100:.0f}%)")
+
+    # Recommendations
+    recs = generate_recommendations(metrics)
+    if recs:
+        print("\n  🎯 Рекомендации по настройке:")
+        for r in recs:
+            sev_icon = "🔴" if r["severity"] == "high" else "🟡" if r["severity"] == "medium" else "🟢"
+            print(f"    {sev_icon} [{r['area']}] {r['action']}")
     else:
-        for p in proposals:
-            print(f"  📐 {p['param']}: {p['current']} → {p['proposed']}")
-            print(f"      {p['reason']}")
+        print("\n  ✅ Система работает оптимально — корректировки не нужны")
 
-        if do_apply:
-            apply_proposals(proposals)
-            print("\n  ✅ Пороги обновлены в config.py")
-        else:
-            print("\n  [DRY-RUN] Добавь --apply для записи")
+    # Overall health
+    health_scores = {
+        "good": 3, "ok": 2, "starting": 2,
+        "low": 1, "degraded": 0, "behind": 0,
+    }
+    total_health = sum(
+        health_scores.get(m.get("quality", "ok"), 1)
+        for m in metrics.values() if isinstance(m, dict)
+    )
+    max_health = len(metrics) * 3
+    health_pct = total_health / max_health * 100 if max_health else 0
 
-    print("=" * 60 + "\n")
+    bar = "█" * int(health_pct / 10) + "░" * (10 - int(health_pct / 10))
+    print(f"\n  🏥 System Health: {health_pct:.0f}% {bar}")
 
     if save_md:
-        lines = [
-            f"# ⚙️ Self-Tuner Report — {datetime.now().strftime('%Y-%m-%d %H:%M')}",
-            "",
-            f"Stats: avg={info['avg']}%, stdev={info['stdev']}%,"
-            f" {info['samples']} samples",
-            "",
-        ]
-        if proposals:
-            lines.append("## Proposals")
-            for p in proposals:
-                lines.append(f"- `{p['param']}`: {p['current']} → {p['proposed']}")
-                lines.append(f"  - {p['reason']}")
-        else:
-            lines.append("Все пороги оптимальны ✅")
+        EVOLUTION_DIR.mkdir(parents=True, exist_ok=True)
+        TUNER_CACHE.write_text(json.dumps({
+            "tuned_at": datetime.now().isoformat(),
+            "metrics": metrics,
+            "recommendations": recs,
+            "system_health_pct": round(health_pct, 1),
+        }, indent=2, ensure_ascii=False), encoding="utf-8")
+        print(f"\n  💾 Сохранено: {TUNER_CACHE}")
 
-        REPORTS_DIR.mkdir(parents=True, exist_ok=True)
-        path = REPORTS_DIR / f"tuner_{datetime.now().strftime('%Y%m%d')}.md"
-        path.write_text("\n".join(lines), encoding="utf-8")
-        print(f"📄 Сохранено: {path}")
+    print("\n" + "=" * 60 + "\n")
 
 
 if __name__ == "__main__":

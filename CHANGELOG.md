@@ -4,6 +4,50 @@
 
 ---
 
+## [2026-05-17] - AI Agent - Phase 12: Meta-Evolution 🧬
+
+### Новые агенты
+- **🧠 Knowledge Distiller** (`knowledge_distiller.py`) — дистиллирует insights из всех отчётов
+- **📊 Portfolio Tracker** (`portfolio_tracker.py`) — helicopter view портфеля (ONYX, Sylectus, FreshCut)
+- **🔧 Self-Tuner** (`self_tuner.py`) — метрики эффективности: signal/noise, scrape rate, deal accuracy
+- **⏱️ Performance Benchmarker** (`perf_benchmarker.py`) — время выполнения агентов, тренды, деградация
+
+### Улучшения
+- **Conductor v12** — `--evolve`, 42 agents total
+- **Config** — PORTFOLIO dict, TUNER_METRICS, BENCHMARK_HISTORY_LIMIT
+- **Ruff fixes** — 12 lint ошибок исправлены (F401, F541, F841)
+
+---
+
+## [2026-05-17] - AI Agent - Phase 10: Competitor Intelligence 🕵️
+
+### Новые агенты
+- **🕵️ Competitor Tracker** (`competitor_tracker.py`) — мониторинг конкурентов: статус, response time, tech stack
+- **🔍 SEO Watchdog** (`seo_watchdog.py`) — SEO аудит 10 критериев: title, meta, OG, canonical, schema.org
+- **📋 Feature Radar** (`feature_radar.py`) — парсинг changelogs/updates конкурентов, категоризация фич
+- **💲 Pricing Monitor** (`pricing_monitor.py`) — извлечение цен, планов, free tier / enterprise detection
+
+### Улучшения
+- **Conductor v10** — `--phase10`, `--recon`, 38 agents total
+- **Config** — COMPETITORS dict (ONYX: 3, Sylectus: 2), competitor cache paths
+
+---
+
+## [2026-05-17] - AI Agent - Phase 9: Autonomous Loop 🔄
+
+### Новые агенты
+- **🔀 Signal Router** (`signal_router.py`) — маршрутизация сигналов: cheap_deal → Deal Evaluator, hot_trend → Trend Matcher
+- **💰 Deal Evaluator** (`deal_evaluator.py`) — deep-dive M&A (6 критериев): PROSP 7.0/10 WATCH, Speel.co 6.8/10
+- **🔗 Trend Matcher** (`trend_matcher.py`) — 5 пересечений PH↔TrustMRR, AI+Automation горячая ниша (4 матча)
+- **⚡ Action Generator** (`action_generator.py`) — 5 задач в спринт, дедупликация по истории
+
+### Улучшения
+- **Conductor v9** → `--phase9`, `--loop` (Phase 8+9 combo), 34 agents
+- **Signal Router** — дедупликация по имени, передача revenue_30d для growth_signal
+- **PH Tracker** — извлечение votes из votesCount/latestScore/aria-label (Fere AI 1511▲)
+
+---
+
 ## [2026-05-17] - AI Agent - Phase 8: Intelligence Feeds 📡 (LIVE)
 
 ### Новые агенты

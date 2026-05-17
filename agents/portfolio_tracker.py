@@ -1,175 +1,160 @@
 """
-💰 Agent #18: Portfolio Tracker
-Трекает бизнес-метрики и обновляет BUSINESS_METRICS.md.
+📊 Agent #40: Portfolio Tracker
+Отслеживает все наши проекты: стадию, MRR, здоровье, прогресс.
+Даёт helicopter view на весь бизнес-портфель.
 
-    python -m agents.portfolio_tracker          # Обновить
-    python -m agents.portfolio_tracker --save   # + отчёт
+    python -m agents.portfolio_tracker              # Обзор портфеля
+    python -m agents.portfolio_tracker --save       # + сохранить
 """
 
-import re
-import subprocess
+import json
 import sys
 from datetime import datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from agents.config import (
-    PROJECTS, REPORTS_DIR, BUSINESS_METRICS_FILE,
+    PORTFOLIO_CACHE, PORTFOLIO,
+    REPORTS_DIR, EVOLUTION_DIR,
 )
 
 
-def count_commits_week(project_path):
-    try:
-        result = subprocess.run(
-            ["git", "log", "--oneline", "--since=7.days", "--format=%H"],
-            capture_output=True, text=True, timeout=10,
-            cwd=str(project_path), encoding="utf-8", errors="replace",
-        )
-        return len(result.stdout.strip().split("\n")) if result.stdout.strip() else 0
-    except (subprocess.TimeoutExpired, OSError):
-        return 0
+def load_json(path):
+    if path.exists():
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            pass
+    return {}
 
 
-def get_last_commit_date(project_path):
-    try:
-        result = subprocess.run(
-            ["git", "log", "-1", "--format=%ci"],
-            capture_output=True, text=True, timeout=10,
-            cwd=str(project_path), encoding="utf-8", errors="replace",
-        )
-        if result.stdout.strip():
-            return result.stdout.strip()[:10]
-    except (subprocess.TimeoutExpired, OSError):
-        pass
-    return "—"
+def assess_project(name, config):
+    """Оценивает здоровье проекта."""
+    assessment = {
+        "name": name,
+        "type": config["type"],
+        "stage": config["stage"],
+        "mrr": config["mrr"],
+        "url": config["url"],
+        "health": 0,
+        "health_label": "",
+        "actions_pending": 0,
+        "competitor_count": 0,
+        "insights": [],
+        "assessed_at": datetime.now().isoformat(),
+    }
 
+    # Кол-во задач в очереди для этого проекта
+    actions_path = REPORTS_DIR / "signals" / "actions.json"
+    actions_data = load_json(actions_path)
+    all_actions = actions_data.get("actions", [])
+    assessment["actions_pending"] = len([
+        a for a in all_actions
+        if a.get("status") == "pending"
+    ])
 
-def parse_health():
-    reports = sorted(REPORTS_DIR.glob("health_*.md"), reverse=True)
-    if not reports:
-        return {}
-    content = reports[0].read_text(encoding="utf-8", errors="ignore")
-    scores = {}
-    for m in re.finditer(r"## [🟢🟡🔴]\s+(\w+)\s+—\s+(\d+)%", content):
-        scores[m.group(1)] = int(m.group(2))
-    return scores
+    # Конкуренты
+    competitors_path = REPORTS_DIR / "competitors" / "competitors.json"
+    comp_data = load_json(competitors_path)
+    project_comps = comp_data.get(name, [])
+    assessment["competitor_count"] = len(project_comps) if isinstance(project_comps, list) else 0
 
+    # Health score (0-10)
+    health = 5  # Базовый
+    stage = config["stage"]
 
-def determine_status(health_score, commits):
-    if commits == 0:
-        return "💤 Idle"
-    if health_score >= 90:
-        return "🟢 Stable"
-    if health_score >= 70:
-        return "🟡 Active"
-    return "🔴 Critical"
+    if stage == "growth":
+        health += 2
+    elif stage == "mvp":
+        health += 1
+    elif stage == "pre-launch":
+        health -= 1
 
+    if config["mrr"] > 0:
+        health += 2
+    if config["url"]:
+        health += 1
 
-def parse_milestones():
-    """Парсит ключевые milestones из DECISIONS.md каждого проекта."""
-    milestones = {}
-    for name, path in PROJECTS.items():
-        decisions_file = path / "DECISIONS.md"
-        if not decisions_file.exists():
-            continue
-        content = decisions_file.read_text(encoding="utf-8", errors="ignore")
-        # Считаем количество решений
-        count = len(re.findall(r"^##\s+", content, re.MULTILINE))
-        milestones[name] = count
-    return milestones
+    health = max(0, min(10, health))
+    assessment["health"] = health
 
+    if health >= 8:
+        assessment["health_label"] = "🟢 Healthy"
+    elif health >= 5:
+        assessment["health_label"] = "🟡 Needs Attention"
+    else:
+        assessment["health_label"] = "🔴 At Risk"
 
-def generate_portfolio_block(data):
-    """Генерирует блок для BUSINESS_METRICS.md."""
-    now = datetime.now()
-    week_num = now.isocalendar()[1]
+    # Stage-specific insights
+    if stage == "pre-launch":
+        assessment["insights"].append("Нужен MVP для валидации идеи")
+    elif stage == "mvp":
+        assessment["insights"].append("Фокус: первые клиенты и product-market fit")
+    elif stage == "growth":
+        assessment["insights"].append("Фокус: масштабирование и retention")
 
-    lines = [
-        "",
-        f"## 📊 Auto-Generated KPIs (W{week_num})",
-        f"_Обновлено: {now.strftime('%Y-%m-%d %H:%M')}_",
-        "",
-        "| Проект | Commits/W | Health | Status | Last Activity |",
-        "|--------|:---------:|:------:|--------|:-------------:|",
-    ]
-
-    for entry in data:
-        lines.append(
-            f"| {entry['name']} | {entry['commits']} | {entry['health']}%"
-            f" | {entry['status']} | {entry['last_commit']} |"
-        )
-
-    lines.append("")
-    return "\n".join(lines)
-
-
-def update_business_metrics(block):
-    """Обновляет BUSINESS_METRICS.md, заменяя предыдущий блок."""
-    if not BUSINESS_METRICS_FILE.exists():
-        BUSINESS_METRICS_FILE.parent.mkdir(parents=True, exist_ok=True)
-        BUSINESS_METRICS_FILE.write_text(
-            "# 💰 Business Metrics\n" + block, encoding="utf-8"
-        )
-        return True
-
-    content = BUSINESS_METRICS_FILE.read_text(encoding="utf-8")
-
-    # Удаляем предыдущий auto-generated блок
-    pattern = r"\n## 📊 Auto-Generated KPIs.*?(?=\n## |\Z)"
-    cleaned = re.sub(pattern, "", content, flags=re.DOTALL)
-
-    # Добавляем новый
-    updated = cleaned.rstrip() + "\n" + block
-    BUSINESS_METRICS_FILE.write_text(updated, encoding="utf-8")
-    return True
+    return assessment
 
 
 def main():
     args = sys.argv[1:]
-    save_md = "--save" in args or "--md" in args
-
-    health = parse_health()
-    _ = parse_milestones()  # Reserved for future use
-
-    data = []
-    for name, path in PROJECTS.items():
-        if not (path / ".git").exists():
-            continue
-        commits = count_commits_week(path)
-        h = health.get(name, 0)
-        status = determine_status(h, commits)
-        last_commit = get_last_commit_date(path)
-
-        data.append({
-            "name": name,
-            "commits": commits,
-            "health": h,
-            "status": status,
-            "last_commit": last_commit,
-        })
-
-    block = generate_portfolio_block(data)
+    save_md = "--save" in args
 
     print("\n" + "=" * 60)
-    print("  💰 PORTFOLIO TRACKER — Phase 5 Agent #18")
+    print("  📊 PORTFOLIO TRACKER — Phase 12 Agent #40")
     print("=" * 60)
 
-    for entry in data:
-        print(f"  {entry['status']:15s} {entry['name']:12s}"
-              f" {entry['health']}%  {entry['commits']} commits/w")
+    assessments = []
+    total_mrr = 0
 
-    # Update BUSINESS_METRICS.md
-    if update_business_metrics(block):
-        print("\n  ✅ BUSINESS_METRICS.md обновлён")
-        print(f"  📄 {BUSINESS_METRICS_FILE}")
+    for name, config in PORTFOLIO.items():
+        assessment = assess_project(name, config)
+        assessments.append(assessment)
+        total_mrr += assessment["mrr"]
+
+    # Display
+    print(f"\n  {'Проект':<20s} {'Тип':<18s} {'Стадия':<12s} {'MRR':>8s} {'Health':>8s}")
+    print(f"  {'─'*20} {'─'*18} {'─'*12} {'─'*8} {'─'*8}")
+
+    for a in assessments:
+        mrr_str = f"${a['mrr']:,}" if a["mrr"] > 0 else "—"
+        print(f"  {a['name']:<20s} {a['type']:<18s} {a['stage']:<12s} {mrr_str:>8s} "
+              f"{a['health']}/10 {a['health_label']}")
+
+    print(f"\n  💰 Общий MRR портфеля: ${total_mrr:,}/мес")
+    print(f"  📦 Проектов: {len(assessments)}")
+
+    # Detailed view
+    for a in assessments:
+        print(f"\n  ── {a['name']} ──")
+        print(f"    📋 Тип: {a['type']}")
+        print(f"    🎯 Стадия: {a['stage']}")
+        print(f"    ⚡ Задач в очереди: {a['actions_pending']}")
+        print(f"    🏟️ Конкурентов: {a['competitor_count']}")
+        if a["insights"]:
+            for ins in a["insights"]:
+                print(f"    💡 {ins}")
+
+    # Recommendations
+    print("\n  🎯 Рекомендации:")
+    for a in assessments:
+        if a["stage"] == "pre-launch":
+            print(f"    • {a['name']}: запустить MVP для валидации спроса")
+        elif a["stage"] == "mvp" and a["mrr"] == 0:
+            print(f"    • {a['name']}: подключить монетизацию (Stripe/crypto)")
+        elif a["stage"] == "growth":
+            print(f"    • {a['name']}: масштабировать маркетинг, retention")
 
     if save_md:
-        REPORTS_DIR.mkdir(parents=True, exist_ok=True)
-        path = REPORTS_DIR / f"portfolio_{datetime.now().strftime('%Y%m%d')}.md"
-        path.write_text(block, encoding="utf-8")
-        print(f"  📄 Reports: {path}")
+        EVOLUTION_DIR.mkdir(parents=True, exist_ok=True)
+        PORTFOLIO_CACHE.write_text(json.dumps({
+            "assessed_at": datetime.now().isoformat(),
+            "total_mrr": total_mrr,
+            "projects": assessments,
+        }, indent=2, ensure_ascii=False), encoding="utf-8")
+        print(f"\n  💾 Сохранено: {PORTFOLIO_CACHE}")
 
-    print("=" * 60 + "\n")
+    print("\n" + "=" * 60 + "\n")
 
 
 if __name__ == "__main__":

@@ -143,8 +143,26 @@ def parse_ph_page(html):
                 "source": "producthunt",
             })
 
+    # Достаём votes из HTML для всех продуктов без голосов
+    # Ищем паттерны: "votesCount":N, "latestScore":N, aria-label="N upvotes"
+    vote_patterns = re.findall(
+        r'"(?:votesCount|latestScore|launchDayScore)"\s*:\s*(\d+)',
+        html
+    )
+    # Также ищем aria-label="123 upvotes"
+    aria_votes = re.findall(r'aria-label="(\d+)\s*upvote', html)
+    all_votes = [int(v) for v in (vote_patterns + aria_votes) if int(v) > 0]
+
+    if all_votes and products:
+        # Назначаем votes по порядку (сортировка PH = по votes desc)
+        all_votes_sorted = sorted(set(all_votes), reverse=True)
+        for i, prod in enumerate(products):
+            if prod.get("votes", 0) == 0 and i < len(all_votes_sorted):
+                prod["votes"] = all_votes_sorted[i]
+
     if products:
-        print(f"     → Strategy 2 (Apollo SSR): {len(products)} продуктов")
+        with_votes = sum(1 for p in products if p.get("votes", 0) > 0)
+        print(f"     → Strategy 2 (Apollo SSR): {len(products)} продуктов, {with_votes} с голосами")
         return products
 
     # ─── Strategy 3: Regex fallback ───────────────────────

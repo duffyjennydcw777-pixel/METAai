@@ -1,179 +1,236 @@
 """
-🧬 Agent #22: Knowledge Distiller
-Извлекает паттерны и знания из всех отчётов, сохраняет в Second Brain.
+🧠 Agent #39: Knowledge Distiller
+Агрегирует insights из всех отчётов системы в единую базу знаний.
+Выявляет паттерны, тренды, аномалии.
 
-    python -m agents.knowledge_distiller          # Анализ
-    python -m agents.knowledge_distiller --save   # + в Knowledge
+    python -m agents.knowledge_distiller           # Дистиллировать знания
+    python -m agents.knowledge_distiller --save    # + сохранить
 """
 
-import re
+import json
 import sys
-from collections import Counter
 from datetime import datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from agents.config import REPORTS_DIR, KNOWLEDGE_DIR
+from agents.config import (
+    KNOWLEDGE_CACHE, KNOWLEDGE_MAX_INSIGHTS,
+    REPORTS_DIR, EVOLUTION_DIR,
+)
 
 
-def scan_reports():
-    """Сканирует все отчёты и извлекает ключевые данные."""
-    if not REPORTS_DIR.exists():
-        return {}
-
-    data = {
-        "total_reports": 0,
-        "agent_runs": Counter(),
-        "issues_found": [],
-        "recommendations": [],
-        "health_history": [],
-        "recurring_problems": Counter(),
-    }
-
-    for f in sorted(REPORTS_DIR.glob("*.md")):
-        data["total_reports"] += 1
-        content = f.read_text(encoding="utf-8", errors="ignore")
-
-        # Identify agent type from filename
-        agent_type = f.stem.split("_")[0]
-        data["agent_runs"][agent_type] += 1
-
-        # Extract health scores
-        for m in re.finditer(r"(\w+)\s+.*?(\d+)%", content):
-            project = m.group(1)
-            score = int(m.group(2))
-            if 0 < score <= 100:
-                data["health_history"].append({
-                    "project": project, "score": score, "file": f.name
-                })
-
-        # Extract issues/problems
-        for m in re.finditer(r"[🔴❌]\s*(.+)", content):
-            issue = m.group(1).strip()[:100]
-            data["issues_found"].append(issue)
-            # Track recurring
-            key = re.sub(r"\d+", "N", issue)[:50]
-            data["recurring_problems"][key] += 1
-
-        # Extract recommendations
-        for m in re.finditer(r"[→➡️]\s*(.+)", content):
-            rec = m.group(1).strip()[:100]
-            data["recommendations"].append(rec)
-
-    return data
+def load_json(path):
+    """Безопасная загрузка JSON."""
+    if path.exists():
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            pass
+    return {}
 
 
-def extract_patterns(data):
-    """Извлекает паттерны из данных."""
-    patterns = []
+def distill_signals():
+    """Извлекает insights из сигналов."""
+    insights = []
+    signals_path = REPORTS_DIR / "signals" / "routed.json"
+    data = load_json(signals_path)
 
-    # Recurring problems (appeared 3+ times)
-    for problem, count in data["recurring_problems"].most_common(10):
-        if count >= 2:
-            patterns.append({
-                "type": "recurring",
-                "description": problem,
-                "count": count,
-                "severity": "high" if count >= 5 else "medium",
-            })
+    signals = data.get("signals", [])
+    if not signals:
+        return insights
 
-    # Most active agents
-    for agent, count in data["agent_runs"].most_common(5):
-        patterns.append({
-            "type": "activity",
-            "description": f"Agent '{agent}' ran {count} times",
-            "count": count,
-            "severity": "info",
+    # Топ сигнал
+    by_type = {}
+    for s in signals:
+        by_type.setdefault(s["type"], []).append(s)
+
+    for sig_type, items in by_type.items():
+        insights.append({
+            "source": "signal_router",
+            "type": "summary",
+            "insight": f"{len(items)} сигналов типа '{sig_type}'",
+            "priority": len(items),
         })
 
-    return patterns
+    return insights
 
 
-def generate_knowledge(data, patterns):
-    """Генерирует knowledge document."""
-    now = datetime.now().strftime("%Y-%m-%d %H:%M")
+def distill_deals():
+    """Извлекает insights из оценок сделок."""
+    insights = []
+    deals_path = REPORTS_DIR / "signals" / "deal_evaluations.json"
+    data = load_json(deals_path)
 
-    lines = [
-        "---",
-        f"updated: {now}",
-        "tags: [auto-generated, knowledge, meta-engineering]",
-        "---",
-        "",
-        "# 🧬 METAai Knowledge Base — Auto-Generated",
-        "",
-        f"_Обновлено: {now}_",
-        f"_Источник: {data['total_reports']} отчётов_",
-        "",
-        "## 📊 Статистика агентов",
-        "",
-        "| Агент | Прогонов |",
-        "|-------|:--------:|",
-    ]
+    evaluations = data.get("evaluations", [])
+    for ev in evaluations:
+        if ev.get("verdict") == "🟢 BUY":
+            insights.append({
+                "source": "deal_evaluator",
+                "type": "opportunity",
+                "insight": f"BUY рекомендация: {ev['name']} — {ev['total']}/10, "
+                           f"${ev.get('mrr', 0):,}/мес за ${ev.get('price', 0):,}",
+                "priority": ev.get("total", 0) * 10,
+            })
 
-    for agent, count in data["agent_runs"].most_common():
-        lines.append(f"| {agent} | {count} |")
+    return insights
 
-    if patterns:
-        lines.extend(["", "## 🔄 Повторяющиеся паттерны", ""])
-        for p in patterns:
-            icon = "🔴" if p["severity"] == "high" else "🟡" if p["severity"] == "medium" else "ℹ️"
-            lines.append(f"- {icon} **{p['description']}** (×{p['count']})")
 
-    # Top recommendations
-    if data["recommendations"]:
-        lines.extend(["", "## 💡 Собранные рекомендации", ""])
-        seen = set()
-        for rec in data["recommendations"][:15]:
-            if rec not in seen:
-                lines.append(f"- {rec}")
-                seen.add(rec)
+def distill_trends():
+    """Извлекает insights из трендов."""
+    insights = []
+    trends_path = REPORTS_DIR / "signals" / "trend_matches.json"
+    data = load_json(trends_path)
 
-    lines.append("")
-    return "\n".join(lines)
+    matches = data.get("matches", [])
+    # Подсчёт горячих ниш
+    niche_counts = {}
+    for m in matches:
+        for n in m.get("niches", []):
+            niche_counts[n] = niche_counts.get(n, 0) + 1
+
+    for niche, count in sorted(niche_counts.items(), key=lambda x: -x[1]):
+        if count >= 2:
+            insights.append({
+                "source": "trend_matcher",
+                "type": "hot_niche",
+                "insight": f"Горячая ниша: '{niche}' — {count} пересечений PH↔TrustMRR",
+                "priority": count * 5,
+            })
+
+    return insights
+
+
+def distill_competitors():
+    """Извлекает insights из разведки конкурентов."""
+    insights = []
+
+    # SEO данные
+    seo_path = REPORTS_DIR / "competitors" / "seo.json"
+    seo_data = load_json(seo_path)
+
+    for project in ["ONYX", "Sylectus"]:
+        for audit in seo_data.get(project, []):
+            if isinstance(audit, dict):
+                score = audit.get("score", 0)
+                name = audit.get("name", "")
+                if score <= 5:
+                    insights.append({
+                        "source": "seo_watchdog",
+                        "type": "weakness",
+                        "insight": f"Слабый SEO у конкурента {name}: {score}/10 — "
+                                   f"возможность обойти",
+                        "priority": (10 - score) * 3,
+                    })
+
+    # Pricing данные
+    pricing_path = REPORTS_DIR / "competitors" / "pricing.json"
+    pricing_data = load_json(pricing_path)
+
+    for project in ["ONYX", "Sylectus"]:
+        for pricing in pricing_data.get(project, []):
+            if isinstance(pricing, dict) and pricing.get("prices_found"):
+                name = pricing.get("name", "")
+                prices = pricing["prices_found"]
+                min_p = min(prices)
+                max_p = max(prices)
+                insights.append({
+                    "source": "pricing_monitor",
+                    "type": "competitive_intel",
+                    "insight": f"{name}: ценовой диапазон ${min_p}-${max_p}",
+                    "priority": 5,
+                })
+
+    return insights
+
+
+def distill_actions():
+    """Извлекает insights из очереди задач."""
+    insights = []
+    actions_path = REPORTS_DIR / "signals" / "actions.json"
+    data = load_json(actions_path)
+
+    actions = data.get("actions", [])
+    pending = [a for a in actions if a.get("status") == "pending"]
+
+    if pending:
+        insights.append({
+            "source": "action_generator",
+            "type": "backlog",
+            "insight": f"{len(pending)} задач в очереди ожидают выполнения",
+            "priority": len(pending) * 2,
+        })
+
+    return insights
 
 
 def main():
     args = sys.argv[1:]
-    save_md = "--save" in args or "--md" in args
-
-    data = scan_reports()
+    save_md = "--save" in args
 
     print("\n" + "=" * 60)
-    print("  🧬 KNOWLEDGE DISTILLER — Phase 6 Agent #22")
+    print("  🧠 KNOWLEDGE DISTILLER — Phase 12 Agent #39")
     print("=" * 60)
 
-    if not data or data["total_reports"] == 0:
-        print("  ⚠️ Нет отчётов для анализа")
-        print("=" * 60 + "\n")
-        return
+    all_insights = []
 
-    patterns = extract_patterns(data)
+    # Собираем insights из всех источников
+    sources = [
+        ("Signals", distill_signals),
+        ("Deals", distill_deals),
+        ("Trends", distill_trends),
+        ("Competitors", distill_competitors),
+        ("Actions", distill_actions),
+    ]
 
-    print(f"  📊 Отчётов проанализировано: {data['total_reports']}")
-    print(f"  🔍 Проблем найдено: {len(data['issues_found'])}")
-    print(f"  🔄 Паттернов: {len(patterns)}")
-    print(f"  💡 Рекомендаций: {len(data['recommendations'])}")
+    for name, fn in sources:
+        insights = fn()
+        all_insights.extend(insights)
+        print(f"\n  📂 {name}: {len(insights)} insights")
 
-    for p in patterns[:5]:
-        icon = "🔴" if p["severity"] == "high" else "🟡"
-        print(f"  {icon} {p['description']} (×{p['count']})")
+    # Сортировка по приоритету
+    all_insights.sort(key=lambda x: -x.get("priority", 0))
 
-    knowledge = generate_knowledge(data, patterns)
+    # Лимит
+    all_insights = all_insights[:KNOWLEDGE_MAX_INSIGHTS]
+
+    # Display
+    print(f"\n  🧠 Всего insights: {len(all_insights)}")
+    if all_insights:
+        print("\n  📊 Топ-10 insights:")
+        for i, ins in enumerate(all_insights[:10], 1):
+            src = ins["source"][:15]
+            typ = ins["type"][:12]
+            text = ins["insight"][:60]
+            prio = ins.get("priority", 0)
+            print(f"    {i:2d}. [{src:15s}] [{typ:12s}] P{prio:>3.0f} | {text}")
+
+    # Мета-анализ
+    by_source = {}
+    by_type = {}
+    for ins in all_insights:
+        by_source[ins["source"]] = by_source.get(ins["source"], 0) + 1
+        by_type[ins["type"]] = by_type.get(ins["type"], 0) + 1
+
+    print("\n  📈 По источникам:")
+    for src, count in sorted(by_source.items(), key=lambda x: -x[1]):
+        print(f"    {src:20s}: {count}")
+
+    print("\n  🏷️ По типам:")
+    for typ, count in sorted(by_type.items(), key=lambda x: -x[1]):
+        print(f"    {typ:20s}: {count}")
 
     if save_md:
-        # Save to Obsidian
-        KNOWLEDGE_DIR.mkdir(parents=True, exist_ok=True)
-        kb_path = KNOWLEDGE_DIR / "Auto_Knowledge.md"
-        kb_path.write_text(knowledge, encoding="utf-8")
-        print(f"\n  📄 Obsidian: {kb_path}")
+        EVOLUTION_DIR.mkdir(parents=True, exist_ok=True)
+        KNOWLEDGE_CACHE.write_text(json.dumps({
+            "distilled_at": datetime.now().isoformat(),
+            "total": len(all_insights),
+            "insights": all_insights,
+            "by_source": by_source,
+            "by_type": by_type,
+        }, indent=2, ensure_ascii=False), encoding="utf-8")
+        print(f"\n  💾 Сохранено: {KNOWLEDGE_CACHE}")
 
-        # Save to reports
-        REPORTS_DIR.mkdir(parents=True, exist_ok=True)
-        path = REPORTS_DIR / f"knowledge_{datetime.now().strftime('%Y%m%d')}.md"
-        path.write_text(knowledge, encoding="utf-8")
-        print(f"  📄 Reports: {path}")
-
-    print("=" * 60 + "\n")
+    print("\n" + "=" * 60 + "\n")
 
 
 if __name__ == "__main__":

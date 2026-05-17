@@ -1,17 +1,20 @@
 """
-🎼 Conductor v8 — Мастер-процесс для всех агентов
-Запускает все 30 агентов Phase 1-8, агрегирует результаты.
+🎼 Conductor v12 — Мастер-процесс для всех агентов
+Запускает все 42 агента Phase 1-12, агрегирует результаты.
 
 Использование:
     python -m agents.conductor                 # Запустить все агенты
     python -m agents.conductor --fix           # Запустить + авто-фикс (Phase 1)
     python -m agents.conductor --save          # Сохранить все отчёты
-    python -m agents.conductor --phase1-6      # Только конкретная фаза
+    python -m agents.conductor --phase1-12     # Только конкретная фаза
     python -m agents.conductor --fix-all       # Phase 1+3 fix + Phase 4 auto-commit
     python -m agents.conductor --notify        # Telegram report
     python -m agents.conductor --sprint        # Sprint Planner
     python -m agents.conductor --release       # Release Manager (--tag для создания)
     python -m agents.conductor --digest        # Weekly Digest
+    python -m agents.conductor --loop          # Phase 8+9 (Intelligence → Action)
+    python -m agents.conductor --recon         # Phase 10 (Competitor Intelligence)
+    python -m agents.conductor --evolve        # Phase 12 (Meta-Evolution)
     python -m agents.conductor --kill-all      # Kill switch
 """
 
@@ -62,8 +65,8 @@ def main():
 
     now = datetime.now()
     print("\n" + "╔" + "═" * 58 + "╗")
-    print("║" + "  🎼 CONDUCTOR v8 — Meta-Engineering Agent Orchestrator".center(58) + "║")
-    print("║" + f"  Phase 1-8 | 30 agents | {now.strftime('%Y-%m-%d %H:%M:%S')}".center(58) + "║")
+    print("║" + "  🎼 CONDUCTOR v12 — Meta-Engineering Agent Orchestrator".center(58) + "║")
+    print("║" + f"  Phase 1-12 | 42 agents | {now.strftime('%Y-%m-%d %H:%M:%S')}".center(58) + "║")
     print("╚" + "═" * 58 + "╝")
 
     extra = []
@@ -80,16 +83,22 @@ def main():
     phase6_only = "--phase6" in args
     phase7_only = "--phase7" in args
     phase8_only = "--phase8" in args
+    phase9_only = "--phase9" in args
+    phase10_only = "--phase10" in args
     do_digest = "--digest" in args
     do_notify = "--notify" in args
     do_sprint = "--sprint" in args
     do_release = "--release" in args
     do_market = "--market" in args
     do_feeds = "--feeds" in args
+    do_loop = "--loop" in args  # Phase 8+9 combo
+    do_recon = "--recon" in args  # Phase 10
+    do_evolve = "--evolve" in args  # Phase 12
     run_all = not any([phase1_only, phase2_only, phase3_only, phase4_only,
                        phase5_only, phase6_only, phase7_only, phase8_only,
+                       phase9_only, phase10_only,
                        do_digest, do_notify, do_sprint, do_release,
-                       do_market, do_feeds])
+                       do_market, do_feeds, do_loop, do_recon, do_evolve])
     fix_all = "--fix-all" in args
 
     results = {}
@@ -313,7 +322,7 @@ def main():
     # ═══════════════════════════════════════════════════════
     # PHASE 8: Intelligence Feeds
     # ═══════════════════════════════════════════════════════
-    if run_all or phase8_only or do_feeds:
+    if run_all or phase8_only or do_feeds or do_loop:
         print("\n" + "█" * 60)
         print("  📡 PHASE 8 — Intelligence Feeds")
         print("█" * 60)
@@ -337,6 +346,94 @@ def main():
         print_banner("📡 Agent #30: Feed Aggregator")
         fa_args = ["--save"] if "--save" in args else []
         results["aggregator"] = run_agent("feed_aggregator", fa_args)
+
+    # ═══════════════════════════════════════════════════════
+    # PHASE 9: Autonomous Loop
+    # ═══════════════════════════════════════════════════════
+    if run_all or phase9_only or do_loop:
+        print("\n" + "█" * 60)
+        print("  🔄 PHASE 9 — Autonomous Loop")
+        print("█" * 60)
+
+        # Agent #31: Signal Router
+        print_banner("🔀 Agent #31: Signal Router")
+        sr_args = ["--save"] if "--save" in args else []
+        results["signal_router"] = run_agent("signal_router", sr_args)
+
+        # Agent #32: Deal Evaluator
+        print_banner("💰 Agent #32: Deal Evaluator")
+        de_args = ["--save"] if "--save" in args else []
+        results["deal_evaluator"] = run_agent("deal_evaluator", de_args)
+
+        # Agent #33: Trend Matcher
+        print_banner("🔗 Agent #33: Trend Matcher")
+        tm_args = ["--save"] if "--save" in args else []
+        results["trend_matcher"] = run_agent("trend_matcher", tm_args)
+
+        # Agent #34: Action Generator
+        print_banner("⚡ Agent #34: Action Generator")
+        ag_args = ["--save"] if "--save" in args else []
+        results["action_gen"] = run_agent("action_generator", ag_args)
+
+    # Intelligence → Action loop (Phase 8 + Phase 9)
+    if do_loop:
+        pass  # Phase 8 already ran above via do_loop, Phase 9 also ran
+
+    # ═══════════════════════════════════════════════════════
+    # PHASE 10: Competitor Intelligence
+    # ═══════════════════════════════════════════════════════
+    if run_all or phase10_only or do_recon:
+        print("\n" + "█" * 60)
+        print("  🕵️ PHASE 10 — Competitor Intelligence")
+        print("█" * 60)
+
+        # Agent #35: Competitor Tracker
+        print_banner("🕵️ Agent #35: Competitor Tracker")
+        ct_args = ["--save"] if "--save" in args else []
+        results["competitor_tracker"] = run_agent("competitor_tracker", ct_args)
+
+        # Agent #36: SEO Watchdog
+        print_banner("🔍 Agent #36: SEO Watchdog")
+        seo_args = ["--save"] if "--save" in args else []
+        results["seo_watchdog"] = run_agent("seo_watchdog", seo_args)
+
+        # Agent #37: Feature Radar
+        print_banner("📋 Agent #37: Feature Radar")
+        fr_args = ["--save"] if "--save" in args else []
+        results["feature_radar"] = run_agent("feature_radar", fr_args)
+
+        # Agent #38: Pricing Monitor
+        print_banner("💲 Agent #38: Pricing Monitor")
+        pm_args = ["--save"] if "--save" in args else []
+        results["pricing_monitor"] = run_agent("pricing_monitor", pm_args)
+
+    # ═══════════════════════════════════════════════════════
+    # PHASE 12: Meta-Evolution
+    # ═══════════════════════════════════════════════════════
+    if run_all or do_evolve:
+        print("\n" + "█" * 60)
+        print("  🧬 PHASE 12 — Meta-Evolution")
+        print("█" * 60)
+
+        # Agent #39: Knowledge Distiller
+        print_banner("🧠 Agent #39: Knowledge Distiller")
+        kd_args = ["--save"] if "--save" in args else []
+        results["knowledge_distiller"] = run_agent("knowledge_distiller", kd_args)
+
+        # Agent #40: Portfolio Tracker
+        print_banner("📊 Agent #40: Portfolio Tracker")
+        pt_args = ["--save"] if "--save" in args else []
+        results["portfolio_tracker"] = run_agent("portfolio_tracker", pt_args)
+
+        # Agent #41: Self-Tuner
+        print_banner("🔧 Agent #41: Self-Tuner")
+        st_args = ["--save"] if "--save" in args else []
+        results["self_tuner"] = run_agent("self_tuner", st_args)
+
+        # Agent #42: Performance Benchmarker
+        print_banner("⏱️ Agent #42: Performance Benchmarker")
+        pb_args = ["--save"] if "--save" in args else []
+        results["perf_benchmarker"] = run_agent("perf_benchmarker", pb_args)
 
     # ═══════════════════════════════════════════════════════
     # SUMMARY
