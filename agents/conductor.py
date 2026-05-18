@@ -1,12 +1,12 @@
 """
-🎼 Conductor v12 — Мастер-процесс для всех агентов
-Запускает все 42 агента Phase 1-12, агрегирует результаты.
+🎼 Conductor v13 — Мастер-процесс для всех агентов
+Запускает все 50 агентов Phase 1-13, агрегирует результаты.
 
 Использование:
     python -m agents.conductor                 # Запустить все агенты
     python -m agents.conductor --fix           # Запустить + авто-фикс (Phase 1)
     python -m agents.conductor --save          # Сохранить все отчёты
-    python -m agents.conductor --phase1-12     # Только конкретная фаза
+    python -m agents.conductor --phase1-13     # Только конкретная фаза
     python -m agents.conductor --fix-all       # Phase 1+3 fix + Phase 4 auto-commit
     python -m agents.conductor --notify        # Telegram report
     python -m agents.conductor --sprint        # Sprint Planner
@@ -15,6 +15,9 @@
     python -m agents.conductor --loop          # Phase 8+9 (Intelligence → Action)
     python -m agents.conductor --recon         # Phase 10 (Competitor Intelligence)
     python -m agents.conductor --evolve        # Phase 12 (Meta-Evolution)
+    python -m agents.conductor --phase13       # Phase 13 (Self-Evolving)
+    python -m agents.conductor --bot           # Telegram Command Bot (long-polling)
+    python -m agents.conductor --watch         # Event Watcher (polling)
     python -m agents.conductor --kill-all      # Kill switch
 """
 
@@ -65,8 +68,8 @@ def main():
 
     now = datetime.now()
     print("\n" + "╔" + "═" * 58 + "╗")
-    print("║" + "  🎼 CONDUCTOR v12 — Meta-Engineering Agent Orchestrator".center(58) + "║")
-    print("║" + f"  Phase 1-12 | 42 agents | {now.strftime('%Y-%m-%d %H:%M:%S')}".center(58) + "║")
+    print("║" + "  🎼 CONDUCTOR v13 — Self-Evolving Agent Orchestrator".center(58) + "║")
+    print("║" + f"  Phase 1-13 | 50 agents | {now.strftime('%Y-%m-%d %H:%M:%S')}".center(58) + "║")
     print("╚" + "═" * 58 + "╝")
 
     extra = []
@@ -94,11 +97,15 @@ def main():
     do_loop = "--loop" in args  # Phase 8+9 combo
     do_recon = "--recon" in args  # Phase 10
     do_evolve = "--evolve" in args  # Phase 12
+    phase13_only = "--phase13" in args  # Phase 13
+    do_bot = "--bot" in args  # Telegram Command Bot
+    do_watch = "--watch" in args  # Event Watcher
     run_all = not any([phase1_only, phase2_only, phase3_only, phase4_only,
                        phase5_only, phase6_only, phase7_only, phase8_only,
-                       phase9_only, phase10_only,
+                       phase9_only, phase10_only, phase13_only,
                        do_digest, do_notify, do_sprint, do_release,
-                       do_market, do_feeds, do_loop, do_recon, do_evolve])
+                       do_market, do_feeds, do_loop, do_recon, do_evolve,
+                       do_bot, do_watch])
     fix_all = "--fix-all" in args
 
     results = {}
@@ -434,6 +441,53 @@ def main():
         print_banner("⏱️ Agent #42: Performance Benchmarker")
         pb_args = ["--save"] if "--save" in args else []
         results["perf_benchmarker"] = run_agent("perf_benchmarker", pb_args)
+
+    # ═══════════════════════════════════════════════════════
+    # PHASE 13: Self-Evolving System (Level 5)
+    # ═══════════════════════════════════════════════════════
+    if run_all or phase13_only:
+        print("\n" + "█" * 60)
+        print("  🧬 PHASE 13 — Self-Evolving System")
+        print("█" * 60)
+
+        # Agent #44: LLM Reasoner (strategy mode)
+        print_banner("🧠 Agent #44: LLM Reasoner")
+        llm_args = ["--mode", "strategy"]
+        if "--save" in args:
+            llm_args.append("--save")
+        results["llm_reasoner"] = run_agent("llm_reasoner", llm_args)
+
+        # Agent #46: Config Evolver
+        print_banner("🔧 Agent #46: Config Evolver")
+        ce_args = ["--save"] if "--save" in args else []
+        results["config_evolver"] = run_agent("config_evolver", ce_args)
+
+        # Agent #48: Revenue Tracker
+        print_banner("💰 Agent #48: Revenue Tracker")
+        rt_args = ["--save"] if "--save" in args else []
+        results["revenue_tracker"] = run_agent("revenue_tracker", rt_args)
+
+        # Agent #49: Opportunity Engine
+        print_banner("🔮 Agent #49: Opportunity Engine")
+        oe_args = ["--save"] if "--save" in args else []
+        results["opportunity_engine"] = run_agent("opportunity_engine", oe_args)
+
+        # Agent #50: System Architect
+        print_banner("🏗️ Agent #50: System Architect")
+        sa_args = ["--save"] if "--save" in args else []
+        results["system_architect"] = run_agent("system_architect", sa_args)
+
+    # Standalone modes
+    if do_bot:
+        print_banner("🤖 Agent #43: Telegram Command Bot")
+        results["telegram_command_bot"] = run_agent("telegram_command_bot")
+
+    if do_watch:
+        print_banner("👁️ Agent #47: Event Watcher")
+        ew_args = ["--watch"]
+        if "--save" in args:
+            ew_args.append("--save")
+        results["event_watcher"] = run_agent("event_watcher", ew_args)
 
     # ═══════════════════════════════════════════════════════
     # SUMMARY

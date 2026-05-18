@@ -4,6 +4,24 @@
 
 ---
 
+## [2026-05-18] - AI Agent - Phase 13: Self-Evolving System 🧬 (Level 5)
+
+### Новые агенты
+- **🤖 Telegram Command Bot** (`telegram_command_bot.py`) — интерактивный интерфейс: /status, /ask, /run, approve/reject кнопки
+- **🧠 LLM Reasoner** (`llm_reasoner.py`) — OpenRouter API, 5 режимов: strategy, analyze_deal, market_brief, find_gaps, new_business
+- **🧬 Agent Generator** (`agent_generator.py`) — Level 5: система пишет новых агентов через LLM → drafts/ → approve
+- **🔧 Config Evolver** (`config_evolver.py`) — анализ метрик Self-Tuner → предложения по изменению порогов config.py
+- **👁️ Event Watcher** (`event_watcher.py`) — файловый мониторинг + триггеры агентов при изменениях
+- **💰 Revenue Tracker** (`revenue_tracker.py`) — CryptoCloud API, реальный MRR для ВСЕХ проектов
+- **🔮 Opportunity Engine** (`opportunity_engine.py`) — LLM + все данные → генерация НОВЫХ бизнес-идей
+- **🏗️ System Architect** (`system_architect.py`) — анализ покрытия доменов, blind spots, предложения новых агентов
+
+### Улучшения
+- **Conductor v13** — `--phase13`, `--bot`, `--watch`, 50 agents total
+- **Config** — LLM_*, AGENT_DRAFTS_DIR, CRYPTOCLOUD_*, APPROVAL_*, EVENT_WATCHER_*
+
+---
+
 ## [2026-05-17] - AI Agent - Phase 12: Meta-Evolution 🧬
 
 ### Новые агенты

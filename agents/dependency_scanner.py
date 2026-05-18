@@ -209,8 +209,8 @@ def generate_report(do_audit: bool = False) -> str:
 
         lines.append(f"### {icon} {name} ({stack})")
         lines.append("")
-        lines.append(f"| Метрика | Значение |")
-        lines.append(f"|---------|----------|")
+        lines.append("| Метрика | Значение |")
+        lines.append("|---------|----------|")
         lines.append(f"| Зависимостей | {total_deps} |")
 
         if node_deps["dev_deps_count"]:
@@ -219,7 +219,7 @@ def generate_report(do_audit: bool = False) -> str:
         lines.append(f"| Lock-файл | {'✅' if has_lock else '❌'} |")
 
         if py_deps["has_venv"]:
-            lines.append(f"| Virtual env | ✅ |")
+            lines.append("| Virtual env | ✅ |")
 
         if total_unpinned:
             lines.append(f"| Незафиксировано | ⚠️ {total_unpinned} |")
@@ -228,7 +228,7 @@ def generate_report(do_audit: bool = False) -> str:
 
         if total_unpinned > 0:
             all_unpinned = py_deps["unpinned"] + node_deps["unpinned"]
-            lines.append(f"**Незафиксированные:**")
+            lines.append("**Незафиксированные:**")
             for dep in all_unpinned[:5]:
                 lines.append(f"- `{dep}`")
             if len(all_unpinned) > 5:

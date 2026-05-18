@@ -173,11 +173,11 @@ def generate_report(days: int = 7, fix: bool = False) -> str:
 
             if fix:
                 template = generate_changelog_template(name, commit)
-                lines.append(f"  **Шаблон:**")
-                lines.append(f"  ```markdown")
+                lines.append("  **Шаблон:**")
+                lines.append("  ```markdown")
                 for tl in template.splitlines():
                     lines.append(f"  {tl}")
-                lines.append(f"  ```")
+                lines.append("  ```")
 
         lines.append("")
 
@@ -190,8 +190,8 @@ def generate_report(days: int = 7, fix: bool = False) -> str:
             "",
             "## 📊 Итог",
             "",
-            f"| Метрика | Значение |",
-            f"|---------|----------|",
+            "| Метрика | Значение |",
+            "|---------|----------|",
             f"| Крупных коммитов | {total} |",
             f"| В CHANGELOG | {total_covered} |",
             f"| Пропущено | {total_missing} |",

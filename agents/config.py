@@ -368,3 +368,76 @@ TUNER_METRICS = {
 # Performance Benchmarker
 BENCHMARK_CACHE = EVOLUTION_DIR / "benchmarks.json"
 BENCHMARK_HISTORY_LIMIT = 30  # Хранить N последних запусков
+
+# ═══════════════════════════════════════════════════════════
+# Phase 13: Self-Evolving System (Level 5)
+# ═══════════════════════════════════════════════════════════
+
+# LLM Reasoner
+LLM_API_KEY_ENV = "OPENROUTER_API_KEY"
+LLM_BASE_URL_ENV = "OPENROUTER_BASE_URL"
+LLM_MODEL = "anthropic/claude-3.5-haiku"
+LLM_MAX_TOKENS = 2000
+LLM_TEMPERATURE = 0.3
+LLM_TIMEOUT = 30  # секунд
+
+# Agent Generator
+AGENT_DRAFTS_DIR = ROOT / "agents" / "drafts"
+AGENT_TEMPLATE = '''"""
+{emoji} Agent #{number}: {name}
+{description}
+
+    python -m agents.{module_name}              # Запуск
+    python -m agents.{module_name} --save       # + сохранить
+"""
+
+import json
+import sys
+from datetime import datetime
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from agents.config import REPORTS_DIR
+
+
+def main():
+    args = sys.argv[1:]
+    save_md = "--save" in args
+
+    print("\\n" + "=" * 60)
+    print("  {emoji} {name} — Phase 13 Agent #{number}")
+    print("=" * 60)
+
+    # TODO: Agent logic here
+
+    print("\\n" + "=" * 60 + "\\n")
+
+
+if __name__ == "__main__":
+    main()
+'''
+
+# Config Evolver
+CONFIG_EVOLUTION_LOG = EVOLUTION_DIR / "config_changes.json"
+CONFIG_EVOLVER_MAX_CHANGES = 3  # Максимум изменений за раз
+
+# Event Watcher
+WATCH_DIRS = [str(REPORTS_DIR), str(ROOT / "agents")]
+WATCH_POLL_SESSION = 300      # 5 минут — во время сессии
+WATCH_POLL_BACKGROUND = 3600  # 1 час — фоновый режим
+
+# Revenue Tracker (CryptoCloud)
+CRYPTOCLOUD_API_KEY_ENV = "CRYPTOCLOUD_API_KEY"
+CRYPTOCLOUD_SHOP_ID_ENV = "CRYPTOCLOUD_SHOP_ID"
+CRYPTOCLOUD_API_URL = "https://api.cryptocloud.plus/v2"
+REVENUE_CACHE = EVOLUTION_DIR / "revenue.json"
+
+# Opportunity Engine
+OPPORTUNITY_IDEAS_CACHE = EVOLUTION_DIR / "opportunities.json"
+MAX_IDEAS_PER_RUN = 5
+IDEA_MIN_SCORE_THRESHOLD = 6.0
+
+# Approval Gate
+APPROVAL_LOG = EVOLUTION_DIR / "approvals.json"
+APPROVAL_TIMEOUT_HOURS = 24
+
