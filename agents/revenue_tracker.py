@@ -42,31 +42,35 @@ def get_creds():
     return api_key, shop_id
 
 
-def api_request(api_key, endpoint, params=None):
-    """Вызов CryptoCloud API."""
+def api_request(api_key, endpoint, body=None):
+    """Вызов CryptoCloud API v2 (POST)."""
     url = f"{CRYPTOCLOUD_API_URL}/{endpoint}"
-    if params:
-        qs = "&".join(f"{k}={v}" for k, v in params.items())
-        url = f"{url}?{qs}"
 
     headers = {
         "Authorization": f"Token {api_key}",
         "Content-Type": "application/json",
     }
 
-    req = urllib.request.Request(url, headers=headers)
+    data = json.dumps(body or {}).encode("utf-8")
+    req = urllib.request.Request(url, data=data, headers=headers, method="POST")
     try:
         with urllib.request.urlopen(req, timeout=15) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            return data
+            result = json.loads(resp.read().decode("utf-8"))
+            return result
     except Exception as exc:
         return {"error": str(exc)}
 
 
 def fetch_invoices(api_key):
     """Получить последние инвойсы из CryptoCloud."""
+    now = datetime.now()
+    start = (now - timedelta(days=90)).strftime("%d.%m.%Y")
+    end = now.strftime("%d.%m.%Y")
+
     data = api_request(api_key, "invoice/merchant/list", {
-        "start": 0,
+        "start": start,
+        "end": end,
+        "offset": 0,
         "limit": 100,
     })
 

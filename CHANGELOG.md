@@ -4,7 +4,20 @@
 
 ---
 
-## [2026-05-18] - AI Agent - Phase 13: Self-Evolving System 🧬 (Level 5)
+## [14.0.0] - 2026-05-18
+### Added
+- **Phase 14**: "Blind Spots Closure" (Agents 51-55)
+- **Agent #51**: `Uptime Monitor` - пингует 6 серверов ONYX (SSH, HTTP, 443), алертит в Telegram.
+- **Agent #52**: `Feedback Parser` - собирает отзывы из Telegram, sentiment analysis через LLM (баг/фича/отзыв).
+- **Agent #53**: `Content Generator` - SEO-статьи, social posts, emails на базе ProductHunt/Market трендов.
+- **Agent #54**: `Experiment Tracker` - A/B тесты с расчетом Z-score статистической значимости.
+- **Agent #55**: `Email Automator` - Onboarding, Re-engagement, Upsell email-цепочки через LLM.
+- Обновлен `conductor.py` до **v14** (55 агентов, флаг `--phase14`).
+
+### Fixed
+- **Revenue Tracker (Agent #48)**: Исправлен API вызов (CryptoCloud v2) — теперь POST-запрос с JSON body и датами.
+
+## [13.0.0] - 2026-05-18
 
 ### Новые агенты
 - **🤖 Telegram Command Bot** (`telegram_command_bot.py`) — интерактивный интерфейс: /status, /ask, /run, approve/reject кнопки

@@ -16,6 +16,7 @@
     python -m agents.conductor --recon         # Phase 10 (Competitor Intelligence)
     python -m agents.conductor --evolve        # Phase 12 (Meta-Evolution)
     python -m agents.conductor --phase13       # Phase 13 (Self-Evolving)
+    python -m agents.conductor --phase14       # Phase 14 (Blind Spots)
     python -m agents.conductor --bot           # Telegram Command Bot (long-polling)
     python -m agents.conductor --watch         # Event Watcher (polling)
     python -m agents.conductor --kill-all      # Kill switch
@@ -68,8 +69,8 @@ def main():
 
     now = datetime.now()
     print("\n" + "╔" + "═" * 58 + "╗")
-    print("║" + "  🎼 CONDUCTOR v13 — Self-Evolving Agent Orchestrator".center(58) + "║")
-    print("║" + f"  Phase 1-13 | 50 agents | {now.strftime('%Y-%m-%d %H:%M:%S')}".center(58) + "║")
+    print("║" + "  🎼 CONDUCTOR v14 — Self-Evolving Agent Orchestrator".center(58) + "║")
+    print("║" + f"  Phase 1-14 | 55 agents | {now.strftime('%Y-%m-%d %H:%M:%S')}".center(58) + "║")
     print("╚" + "═" * 58 + "╝")
 
     extra = []
@@ -98,14 +99,16 @@ def main():
     do_recon = "--recon" in args  # Phase 10
     do_evolve = "--evolve" in args  # Phase 12
     phase13_only = "--phase13" in args  # Phase 13
+    phase14_only = "--phase14" in args  # Phase 14
     do_bot = "--bot" in args  # Telegram Command Bot
     do_watch = "--watch" in args  # Event Watcher
-    run_all = not any([phase1_only, phase2_only, phase3_only, phase4_only,
-                       phase5_only, phase6_only, phase7_only, phase8_only,
-                       phase9_only, phase10_only, phase13_only,
-                       do_digest, do_notify, do_sprint, do_release,
-                       do_market, do_feeds, do_loop, do_recon, do_evolve,
-                       do_bot, do_watch])
+    run_all = not any([
+        phase1_only, phase2_only, phase3_only, phase4_only, phase5_only,
+        phase6_only, phase7_only, do_digest, phase8_only, phase9_only,
+        phase10_only, do_market, do_notify, do_sprint, do_release, do_feeds,
+        do_loop, do_recon, do_evolve, phase13_only, phase14_only,
+        do_bot, do_watch,
+    ])
     fix_all = "--fix-all" in args
 
     results = {}
@@ -476,6 +479,39 @@ def main():
         print_banner("🏗️ Agent #50: System Architect")
         sa_args = ["--save"] if "--save" in args else []
         results["system_architect"] = run_agent("system_architect", sa_args)
+
+    # ═══════════════════════════════════════════════════════
+    # PHASE 14: Blind Spots (Monitoring, Content, A/B, Emails)
+    # ═══════════════════════════════════════════════════════
+    if run_all or phase14_only:
+        print("\n" + "█" * 60)
+        print("  🟢 PHASE 14 — Blind Spots Closure")
+        print("█" * 60)
+
+        # Agent #51: Uptime Monitor
+        print_banner("📡 Agent #51: Uptime Monitor")
+        um_args = ["--save"] if "--save" in args else []
+        results["uptime_monitor"] = run_agent("uptime_monitor", um_args)
+
+        # Agent #52: Feedback Parser
+        print_banner("💬 Agent #52: Feedback Parser")
+        fp_args = ["--save", "--llm"] if "--save" in args else []
+        results["feedback_parser"] = run_agent("feedback_parser", fp_args)
+
+        # Agent #53: Content Generator
+        print_banner("✍️ Agent #53: Content Generator")
+        cg_args = ["--save", "--type", "blog"] if "--save" in args else []
+        results["content_generator"] = run_agent("content_generator", cg_args)
+
+        # Agent #54: Experiment Tracker
+        print_banner("🧪 Agent #54: Experiment Tracker")
+        et_args = ["--save"] if "--save" in args else []
+        results["experiment_tracker"] = run_agent("experiment_tracker", et_args)
+
+        # Agent #55: Email Automator
+        print_banner("📧 Agent #55: Email Automator")
+        ea_args = ["--save"] if "--save" in args else []
+        results["email_automator"] = run_agent("email_automator", ea_args)
 
     # Standalone modes
     if do_bot:
